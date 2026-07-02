@@ -1,0 +1,41 @@
+{
+  "name": "Lanttusanomat – satiiriuutiset",
+  "short_name": "Lanttusanomat",
+  "description": "Suomen luotettavin lähde uutisille, jotka eivät ole totta. Kaikki sisältö on satiiria.",
+  "id": "/",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "lang": "fi",
+  "dir": "ltr",
+  "background_color": "#faf8f5",
+  "theme_color": "#4a1d6e",
+  "categories": ["news", "entertainment"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icons/icon-maskable-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/icons/icon-maskable-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

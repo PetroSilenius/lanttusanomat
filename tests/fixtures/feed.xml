@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0">
+  <channel>
+    <title>Testisyöte</title>
+    <link>https://example.fi</link>
+    <description>Testejä varten</description>
+    <item>
+      <title><![CDATA[Eduskunta äänesti uudesta laista &amp; hyväksyi sen]]></title>
+      <link>https://example.fi/uutiset/123</link>
+      <description><![CDATA[Laki hyväksyttiin äänin <b>100–99</b>. Oppositio vaati lisäselvityksiä.]]></description>
+      <pubDate>Wed, 01 Jul 2026 06:00:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Kahvin hinta nousee ennätyslukemiin</title>
+      <link>https://example.fi/uutiset/124</link>
+      <description>Paahtimot varoittavat hinnankorotuksista syksyll&#228;.</description>
+      <pubDate>Wed, 01 Jul 2026 07:30:00 GMT</pubDate>
+    </item>
+    <item>
+      <title>Rikkinäinen kohde ilman linkkiä</title>
+      <description>Tämä pitää ohittaa.</description>
+    </item>
+  </channel>
+</rss>

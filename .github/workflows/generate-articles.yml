@@ -1,0 +1,74 @@
+name: Generate satire articles
+
+on:
+  schedule:
+    # 2 articles per run, 2 runs/day: 05:00 & 12:00 UTC (~08:00 & 15:00 Helsinki)
+    - cron: '0 5 * * *'
+    - cron: '0 12 * * *'
+  workflow_dispatch:
+    inputs:
+      count:
+        description: 'Number of articles to generate'
+        required: false
+        default: '2'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: generate-articles
+  cancel-in-progress: false
+
+jobs:
+  generate:
+    name: Generate & commit articles
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check for API key
+        id: key
+        run: |
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "available=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "ANTHROPIC_API_KEY secret is not set; skipping generation."
+            echo "available=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      - uses: actions/checkout@v4
+        if: steps.key.outputs.available == 'true'
+
+      - uses: pnpm/action-setup@v4
+        if: steps.key.outputs.available == 'true'
+
+      - uses: actions/setup-node@v4
+        if: steps.key.outputs.available == 'true'
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+        if: steps.key.outputs.available == 'true'
+
+      - name: Generate articles
+        if: steps.key.outputs.available == 'true'
+        run: pnpm generate:articles --count ${{ github.event.inputs.count || '2' }}
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+
+      - name: Validate site still builds with new content
+        if: steps.key.outputs.available == 'true'
+        run: pnpm build
+
+      - name: Commit and push
+        if: steps.key.outputs.available == 'true'
+        run: |
+          git config user.name "lanttusanomat-bot"
+          git config user.email "bot@users.noreply.github.com"
+          git add content/articles
+          if git diff --cached --quiet; then
+            echo "No new articles to commit."
+            exit 0
+          fi
+          git commit -m "content: lisää päivän tekoälysatiirit"
+          git push
+        # Push to main triggers the Cloudflare Pages production deployment.

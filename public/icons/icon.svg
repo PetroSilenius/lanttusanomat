@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="Lanttusanomat">
+  <rect width="512" height="512" rx="96" fill="#4a1d6e"/>
+  <!-- Stylized rutabaga (lanttu) -->
+  <path d="M256 150 c86 0 130 52 130 118 c0 74 -58 118 -130 118 c-72 0 -130 -44 -130 -118 c0 -66 44 -118 130 -118 z" fill="#f5c518"/>
+  <path d="M256 150 c86 0 130 52 130 118 l-260 0 c0 -66 44 -118 130 -118 z" fill="#a06cc9" opacity="0.85"/>
+  <path d="M236 92 q20 -28 40 0 q6 34 -20 62 q-26 -28 -20 -62 z" fill="#7bc4a2"/>
+  <path d="M196 108 q26 -18 38 10 q0 26 -22 44 q-22 -24 -16 -54 z" fill="#7bc4a2" opacity="0.9"/>
+  <path d="M316 108 q-26 -18 -38 10 q0 26 22 44 q22 -24 16 -54 z" fill="#7bc4a2" opacity="0.9"/>
+  <path d="M246 386 q10 22 10 34 M266 386 q-4 22 -10 34" stroke="#e0b010" stroke-width="12" stroke-linecap="round" fill="none"/>
+  <text x="256" y="312" font-family="Georgia, 'Times New Roman', serif" font-size="120" font-weight="700" text-anchor="middle" fill="#4a1d6e">L</text>
+</svg>
