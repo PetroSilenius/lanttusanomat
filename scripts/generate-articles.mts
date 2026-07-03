@@ -16,6 +16,7 @@
  */
 import fs from 'node:fs'
 import path from 'node:path'
+import Anthropic from '@anthropic-ai/sdk'
 import { feedSources } from '../src/generation/feeds'
 import { fetchFeed } from '../src/generation/rss'
 import {
@@ -82,6 +83,7 @@ if (dryRun) {
 
 const skill = loadSatireSkill()
 let published = 0
+let hardFailures = 0
 
 for (const topic of topics) {
   if (published >= articleCount) break
@@ -112,9 +114,24 @@ for (const topic of topics) {
     published++
   } catch (error) {
     if (error instanceof GenerationValidationError) {
+      // Editorial rejection (declined topic, length, overlap…) — expected
+      // occasionally; fall through to the next candidate topic.
       console.warn(`  rejected: ${error.message}`)
+    } else if (
+      error instanceof Anthropic.AuthenticationError ||
+      (error as { status?: number }).status === 401
+    ) {
+      // A 401 is fatal for the whole run — every subsequent call would fail
+      // the same way. Fail fast and loudly instead of finishing green.
+      console.error(
+        'Claude API rejected the key (401 invalid x-api-key). ' +
+          'Re-create the ANTHROPIC_API_KEY repo secret with a valid Console API key ' +
+          '(https://console.anthropic.com/settings/keys) — watch for stray whitespace.'
+      )
+      process.exit(1)
     } else {
       console.error(`  generation failed: ${(error as Error).message}`)
+      hardFailures++
     }
   }
 }
@@ -122,3 +139,11 @@ for (const topic of topics) {
 // Verify the new content passes the same validation the site build runs.
 loadArticles(contentDir)
 console.log(`\nDone: ${published}/${articleCount} article(s) generated.`)
+
+// A run that produced nothing *because of errors* must fail the workflow so
+// it is visible. Producing nothing on a quiet news day (few safe topics, or
+// all candidates editorially rejected) is still a successful run.
+if (published === 0 && hardFailures > 0) {
+  console.error(`All ${hardFailures} generation attempt(s) failed with non-editorial errors.`)
+  process.exit(1)
+}
