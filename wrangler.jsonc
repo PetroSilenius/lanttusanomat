@@ -1,0 +1,21 @@
+// Cloudflare Workers static-assets deployment.
+//
+// The site is a fully static Next.js export (output: 'export' → out/), so
+// there is no server code to run: this config makes `wrangler deploy` upload
+// out/ as static assets only. It also stops wrangler's auto-configuration
+// from bolting on the OpenNext server adapter, which does not apply to
+// static exports and fails the build.
+//
+// Build command: pnpm build · Deploy command: npx wrangler deploy
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "lanttusanomat",
+  "compatibility_date": "2026-07-03",
+  "assets": {
+    "directory": "./out",
+    // Serve /artikkeli/foo from artikkeli/foo.html (matches Next's clean URLs)
+    "html_handling": "auto-trailing-slash",
+    // Serve out/404.html (Next's not-found page) for unknown paths
+    "not_found_handling": "404-page",
+  },
+}

@@ -105,15 +105,29 @@ pnpm generate:articles --dry-run    # show today's candidate topics, no API call
 pnpm generate:articles --count 2    # generate for real (needs ANTHROPIC_API_KEY)
 ```
 
-## Deployment (Cloudflare Pages)
+## Deployment (Cloudflare)
 
-1. Create a Cloudflare Pages project connected to this repository.
+The site is a pure static export — deploy it as static files, **not** through a
+Next.js server adapter (OpenNext does not apply and will fail on `output: 'export'`).
+
+**Option A — Workers with static assets (Workers Builds):**
+
+1. Create a Worker connected to this repository (Workers & Pages → Create → import repo).
+2. Build command `pnpm build`, deploy command `npx wrangler deploy`.
+3. [`wrangler.jsonc`](wrangler.jsonc) in the repo does the rest: it deploys `out/`
+   as static assets only, with clean URLs and the 404 page wired up. Its presence
+   also stops wrangler's auto-configuration from installing the OpenNext adapter.
+
+**Option B — classic Cloudflare Pages:**
+
+1. Create a Pages project connected to this repository.
 2. Build command `pnpm build`, output directory `out`, production branch `main`.
-3. Environment variables: see below. Every PR automatically gets a preview URL.
+3. No deploy command is needed — Pages uploads `out/` itself.
 
-Security and caching headers ship in [`public/_headers`](public/_headers)
-(CSP, `X-Frame-Options`, immutable caching for hashed assets, `no-cache` for
-the service worker).
+Environment variables: see below. Security and caching headers ship in
+[`public/_headers`](public/_headers) (CSP, `X-Frame-Options`, immutable caching
+for hashed assets, `no-cache` for the service worker); both Workers static
+assets and Pages honor the `_headers` file.
 
 ## Environment variables
 

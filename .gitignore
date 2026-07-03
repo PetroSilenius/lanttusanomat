@@ -12,6 +12,11 @@ playwright-report/
 test-results/
 .lighthouseci/
 
+# cloudflare / wrangler local state
+.wrangler/
+.open-next/
+.dev.vars
+
 # misc
 .DS_Store
 *.pem
