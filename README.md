@@ -139,6 +139,16 @@ assets and Pages honor the `_headers` file.
 
 There are no runtime secrets — the deployed site is purely static files.
 
+## Dependency updates
+
+Dependency updates are automated with [Renovate](https://docs.renovatebot.com/)
+([`renovate.json`](renovate.json)): weekly grouped update PRs, monthly lockfile
+maintenance, pinned GitHub Action digests, and automerge for dev-dependency
+minors once CI is green. Majors always wait for review, and `zod` majors are
+blocked on purpose (see `AGENTS.md` for the v3/v4 split). To activate it,
+install the [Renovate GitHub App](https://github.com/apps/renovate) and grant
+it access to this repository.
+
 ## Project structure
 
 ```

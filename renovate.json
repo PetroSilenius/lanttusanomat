@@ -1,0 +1,58 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "Renovate config: weekly grouped updates, automerged dev-dep minors (CI gates them), majors held for review.",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "timezone": "Europe/Helsinki",
+  "schedule": ["before 7am on monday"],
+  "labels": ["dependencies"],
+  "rangeStrategy": "bump",
+  "lockFileMaintenance": {
+    "enabled": true,
+    "schedule": ["before 7am on the first day of the month"]
+  },
+  "packageRules": [
+    {
+      "description": "Next.js and its ESLint config are version-synced upstream",
+      "groupName": "Next.js",
+      "matchPackageNames": ["next", "eslint-config-next", "@next/**"]
+    },
+    {
+      "description": "React and its type packages move together",
+      "groupName": "React",
+      "matchPackageNames": ["react", "react-dom", "@types/react", "@types/react-dom"]
+    },
+    {
+      "description": "Tailwind core and the PostCSS plugin move together",
+      "groupName": "Tailwind CSS",
+      "matchPackageNames": ["tailwindcss", "@tailwindcss/**"]
+    },
+    {
+      "description": "The markdown pipeline packages are released in lockstep",
+      "groupName": "unified/remark/rehype",
+      "matchPackageNames": ["unified", "remark-*", "rehype-*"]
+    },
+    {
+      "description": "Playwright minors ship new browser builds; keep them in one PR",
+      "groupName": "Playwright",
+      "matchPackageNames": ["@playwright/test"]
+    },
+    {
+      "description": "CI (typecheck, unit, e2e, Lighthouse) gates these; automerge safe non-majors",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["minor", "patch"],
+      "automerge": true
+    },
+    {
+      "description": "zod major is blocked: src/lib uses the v3 API from 'zod' while src/generation deliberately imports 'zod/v4' for the Anthropic SDK — see AGENTS.md before upgrading",
+      "matchPackageNames": ["zod"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
+      "description": "@types/node majors follow the Node runtime (pinned to 22 in CI and Cloudflare), not the newest release",
+      "matchPackageNames": ["@types/node"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    }
+  ]
+}
