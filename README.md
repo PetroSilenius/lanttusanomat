@@ -11,7 +11,7 @@ The platform is a fully static, offline-capable **PWA** built with Next.js, with
 content managed as Markdown in this repository and an automated AI pipeline that
 writes two new satire articles per day.
 
-- **Frontend:** Next.js 15 (App Router, static export) · TypeScript strict · Tailwind CSS 4
+- **Frontend:** Next.js 16 (App Router, static export) · TypeScript strict · Tailwind CSS 4
 - **Content:** Markdown + validated frontmatter in [`content/articles/`](content/articles)
 - **AI pipeline:** GitHub Actions (2×/day) → Claude API + [Satire Skill](skills/satiiri/SKILL.md) → git commit
 - **Hosting:** Cloudflare Pages (auto-deploy on push)

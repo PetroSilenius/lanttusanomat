@@ -1,6 +1,6 @@
 # Agent instructions — Lanttusanomat
 
-Lanttusanomat is a Finnish satire news site: a fully static Next.js 15 (App
+Lanttusanomat is a Finnish satire news site: a fully static Next.js 16 (App
 Router, `output: 'export'`) PWA whose content is Markdown in this repo, plus an
 AI pipeline that generates satire articles on a schedule. The full design is in
 `docs/TECHNICAL_PLAN.md`; the human-facing overview is `README.md`.
