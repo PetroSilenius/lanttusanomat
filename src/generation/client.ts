@@ -17,11 +17,15 @@ const MODEL = 'claude-opus-4-8'
  * here runs in the frontend.
  */
 export function createGenerationClient(): Anthropic {
+  // Generous retries: this runs in an unattended cron job, and the SDK's
+  // backoff honors the API's retry-after header on 429/5xx.
+  const maxRetries = 4
   const oauthOptions = {
     // Never send x-api-key alongside the Bearer token — the API rejects
     // requests carrying both headers.
     apiKey: null,
     defaultHeaders: { 'anthropic-beta': 'oauth-2025-04-20' },
+    maxRetries,
   }
   const authToken = process.env.ANTHROPIC_AUTH_TOKEN
   if (authToken) {
@@ -31,7 +35,7 @@ export function createGenerationClient(): Anthropic {
   if (apiKey?.startsWith('sk-ant-oat')) {
     return new Anthropic({ ...oauthOptions, authToken: apiKey })
   }
-  return new Anthropic()
+  return new Anthropic({ maxRetries })
 }
 
 /**
@@ -45,7 +49,10 @@ export async function generateSatire(
 ): Promise<SatireOutput> {
   const response = await client.messages.parse({
     model: MODEL,
-    max_tokens: 16000,
+    // The declared max_tokens counts against the account's output-tokens-per-
+    // minute cap when the request is admitted, so keep it within low-tier
+    // rate limits. An article is ≤1000 words; 8k leaves room for thinking.
+    max_tokens: 8000,
     thinking: { type: 'adaptive' },
     system: systemPrompt,
     messages: [{ role: 'user', content: topicPrompt }],

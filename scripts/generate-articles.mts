@@ -85,12 +85,35 @@ const skill = loadSatireSkill()
 let published = 0
 let hardFailures = 0
 
+// Rate-limit buckets refill per minute; this is an unattended cron job, so
+// waiting out a 429 (after the SDK's own retries) is free and usually enough.
+const RATE_LIMIT_PAUSE_MS = 65_000
+const RATE_LIMIT_ATTEMPTS = 3
+
+async function generateWithRateLimitRetry(topicPrompt: string) {
+  for (let attempt = 1; ; attempt++) {
+    try {
+      return await generateSatire(skill, topicPrompt)
+    } catch (error) {
+      const status = (error as { status?: number }).status
+      if (status === 429 && attempt < RATE_LIMIT_ATTEMPTS) {
+        console.warn(
+          `  rate limited (429); waiting ${RATE_LIMIT_PAUSE_MS / 1000}s ` +
+            `before attempt ${attempt + 1}/${RATE_LIMIT_ATTEMPTS}…`
+        )
+        await new Promise((resolve) => setTimeout(resolve, RATE_LIMIT_PAUSE_MS))
+        continue
+      }
+      throw error
+    }
+  }
+}
+
 for (const topic of topics) {
   if (published >= articleCount) break
   console.log(`\nGenerating from topic: ${topic.title}`)
   try {
-    const output = await generateSatire(
-      skill,
+    const output = await generateWithRateLimitRetry(
       buildTopicPrompt(topicSummary(topic), existingTitles)
     )
     validateSatireOutput(
