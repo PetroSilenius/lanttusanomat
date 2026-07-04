@@ -40,8 +40,8 @@ export const categories: readonly Category[] = [
     description: 'Satiiria penkkiurheilusta, tuloksista ja kansallisesta itsetunnosta.',
   },
   {
-    slug: 'suomalainen-elama',
-    name: 'Suomalainen elämä',
+    slug: 'kotimaa',
+    name: 'Kotimaa',
     description: 'Satiiria saunasta, säästä, hiljaisuudesta ja muista kansallisaarteista.',
   },
 ] as const
