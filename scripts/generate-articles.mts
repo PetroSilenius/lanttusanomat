@@ -74,9 +74,15 @@ const topics = selectTopics(items, articleCount * 3)
 console.log(`Selected ${topics.length} candidate topics (target: ${articleCount} articles).`)
 
 if (dryRun) {
+  // Also consumed as the topic briefing by the Claude Code workflow path,
+  // which needs the source URLs to fill originalSources frontmatter.
   for (const topic of topics) {
     console.log(`\n--- ${topic.title} (${topic.sourceCount} sources) ---`)
     console.log(topicSummary(topic))
+    console.log('Source URLs:')
+    for (const url of topicSourceUrls(topic)) {
+      console.log(`- ${url}`)
+    }
   }
   process.exit(0)
 }

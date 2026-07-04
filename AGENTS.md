@@ -55,8 +55,10 @@ gates must stay green.
 - **No new runtime dependencies without good reason.** Search, RSS parsing and
   the service worker are deliberately dependency-free.
 - **No secrets in the frontend.** The only secrets anywhere are the Claude
-  credential (`ANTHROPIC_API_KEY`, or `ANTHROPIC_AUTH_TOKEN` for OAuth tokens —
-  see `src/generation/client.ts`), and they live exclusively in GitHub Actions.
+  credentials for article generation (`CLAUDE_CODE_OAUTH_TOKEN` for the Claude
+  Code action path, or `ANTHROPIC_API_KEY` for the SDK pipeline — see
+  `.github/workflows/generate-articles.yml`), and they live exclusively in
+  GitHub Actions.
 - **System font stack, no external requests.** The CSP in `public/_headers`
   allows same-origin only; anything loading from a third-party origin will be
   blocked in production.

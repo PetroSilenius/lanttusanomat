@@ -23,47 +23,95 @@ jobs:
   generate:
     name: Generate & commit articles
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Check for API credential
-        id: key
+      # Two supported credentials:
+      #  - CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`, works with a
+      #    Claude subscription) -> articles written by the Claude Code action
+      #  - ANTHROPIC_API_KEY (Console API key) -> deterministic SDK pipeline
+      - name: Detect credential
+        id: cred
         run: |
-          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ] || [ -n "${{ secrets.ANTHROPIC_AUTH_TOKEN }}" ]; then
-            echo "available=true" >> "$GITHUB_OUTPUT"
+          if [ -n "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
+            echo "mode=claude-code" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+            echo "mode=api" >> "$GITHUB_OUTPUT"
           else
-            echo "Neither ANTHROPIC_API_KEY nor ANTHROPIC_AUTH_TOKEN secret is set; skipping generation."
-            echo "available=false" >> "$GITHUB_OUTPUT"
+            echo "No CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY secret; skipping generation."
+            echo "mode=none" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/checkout@v4
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
 
       - uses: pnpm/action-setup@v4
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
 
       - uses: actions/setup-node@v4
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
         with:
           node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
 
-      - name: Generate articles
-        if: steps.key.outputs.available == 'true'
+      # Topic discovery, clustering and the banned-topic filter always run in
+      # deterministic, unit-tested code — regardless of which engine writes.
+      - name: Select today's topics
+        if: steps.cred.outputs.mode != 'none'
+        run: |
+          pnpm generate:articles --dry-run --count ${{ github.event.inputs.count || '2' }} \
+            | tee /tmp/daily-topics.md
+
+      - name: Generate articles (API pipeline)
+        if: steps.cred.outputs.mode == 'api'
         run: pnpm generate:articles --count ${{ github.event.inputs.count || '2' }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-          # OAuth alternative (sent as a Bearer token). An sk-ant-oat… token
-          # pasted into ANTHROPIC_API_KEY is also detected and handled.
-          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
+
+      - name: Generate articles (Claude Code)
+        if: steps.cred.outputs.mode == 'claude-code'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Generate today's satire articles for Lanttusanomat.
+
+            1. Read /tmp/daily-topics.md — today's safety-filtered news topics,
+               each with an internal summary and source URLs.
+            2. Read skills/satiiri/SKILL.md — the binding editorial policy.
+            3. Pick the ${{ github.event.inputs.count || '2' }} topic(s) with the
+               best satire potential and write one completely original Finnish
+               satire article per topic, following every rule in SKILL.md.
+               Never copy source wording or structure; skip any topic that
+               touches the banned subjects.
+            4. Save each article as content/articles/<today's date YYYY-MM-DD>-<slug>.md
+               following the frontmatter conventions in CLAUDE.md exactly:
+               aiGenerated: true, author: Lanttusanomat AI-toimitus,
+               category from the fixed registry, heroImage: /images/heroes/<category>.svg,
+               originalSources: the chosen topic's source URLs, published: true.
+               Slugs must be unique — check existing files in content/articles/.
+            5. Run `pnpm build` and fix any content-validation errors it reports.
+
+            Do NOT commit or push — the workflow handles that. Do not modify any
+            files outside content/articles/.
+          claude_args: |
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(pnpm build)"
+            --max-turns 30
+
+      # Third editorial gate for the Claude Code path (the API pipeline runs
+      # the equivalent checks in-process before writing files).
+      - name: Validate new articles
+        if: steps.cred.outputs.mode != 'none'
+        run: pnpm exec tsx scripts/validate-articles.mts
 
       - name: Validate site still builds with new content
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
         run: pnpm build
 
       - name: Commit and push
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.mode != 'none'
         run: |
           git config user.name "lanttusanomat-bot"
           git config user.email "bot@users.noreply.github.com"
@@ -74,4 +122,4 @@ jobs:
           fi
           git commit -m "content: lisää päivän tekoälysatiirit"
           git push
-        # Push to main triggers the Cloudflare Pages production deployment.
+        # Push to main triggers the Cloudflare deployment.
