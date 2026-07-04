@@ -39,8 +39,8 @@ const dryRun = args.includes('--dry-run')
 const countIndex = args.indexOf('--count')
 const articleCount = countIndex >= 0 ? Number(args[countIndex + 1]) : 2
 
-if (!process.env.ANTHROPIC_API_KEY && !dryRun) {
-  console.error('ANTHROPIC_API_KEY is not set; aborting.')
+if (!process.env.ANTHROPIC_API_KEY && !process.env.ANTHROPIC_AUTH_TOKEN && !dryRun) {
+  console.error('Neither ANTHROPIC_API_KEY nor ANTHROPIC_AUTH_TOKEN is set; aborting.')
   process.exit(1)
 }
 
@@ -124,9 +124,9 @@ for (const topic of topics) {
       // A 401 is fatal for the whole run — every subsequent call would fail
       // the same way. Fail fast and loudly instead of finishing green.
       console.error(
-        'Claude API rejected the key (401 invalid x-api-key). ' +
-          'Re-create the ANTHROPIC_API_KEY repo secret with a valid Console API key ' +
-          '(https://console.anthropic.com/settings/keys) — watch for stray whitespace.'
+        'Claude API rejected the credential (401). Re-create the repo secret: ' +
+          'ANTHROPIC_API_KEY for a Console API key (https://console.anthropic.com/settings/keys) ' +
+          'or ANTHROPIC_AUTH_TOKEN for an OAuth token — watch for stray whitespace.'
       )
       process.exit(1)
     } else {

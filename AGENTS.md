@@ -54,8 +54,9 @@ gates must stay green.
   middleware, no `next/image` optimization (images are `unoptimized`).
 - **No new runtime dependencies without good reason.** Search, RSS parsing and
   the service worker are deliberately dependency-free.
-- **No secrets in the frontend.** The only secret anywhere is
-  `ANTHROPIC_API_KEY`, and it lives exclusively in GitHub Actions.
+- **No secrets in the frontend.** The only secrets anywhere are the Claude
+  credential (`ANTHROPIC_API_KEY`, or `ANTHROPIC_AUTH_TOKEN` for OAuth tokens —
+  see `src/generation/client.ts`), and they live exclusively in GitHub Actions.
 - **System font stack, no external requests.** The CSP in `public/_headers`
   allows same-origin only; anything loading from a third-party origin will be
   blocked in production.

@@ -24,13 +24,13 @@ jobs:
     name: Generate & commit articles
     runs-on: ubuntu-latest
     steps:
-      - name: Check for API key
+      - name: Check for API credential
         id: key
         run: |
-          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ] || [ -n "${{ secrets.ANTHROPIC_AUTH_TOKEN }}" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
-            echo "ANTHROPIC_API_KEY secret is not set; skipping generation."
+            echo "Neither ANTHROPIC_API_KEY nor ANTHROPIC_AUTH_TOKEN secret is set; skipping generation."
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
 
@@ -54,6 +54,9 @@ jobs:
         run: pnpm generate:articles --count ${{ github.event.inputs.count || '2' }}
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          # OAuth alternative (sent as a Bearer token). An sk-ant-oat… token
+          # pasted into ANTHROPIC_API_KEY is also detected and handled.
+          ANTHROPIC_AUTH_TOKEN: ${{ secrets.ANTHROPIC_AUTH_TOKEN }}
 
       - name: Validate site still builds with new content
         if: steps.key.outputs.available == 'true'

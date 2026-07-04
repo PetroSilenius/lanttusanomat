@@ -131,11 +131,12 @@ assets and Pages honor the `_headers` file.
 
 ## Environment variables
 
-| Variable               | Where                      | Purpose                                                                                                          |
-| ---------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Cloudflare Pages build env | Canonical origin for metadata, sitemap, RSS (default `https://lanttusanomat.pages.dev`)                          |
-| `ANTHROPIC_API_KEY`    | GitHub Actions **secret**  | Claude API key for article generation. Never exposed to the frontend; the generation workflow no-ops without it. |
-| `NODE_VERSION`         | Cloudflare Pages build env | Set to `22`                                                                                                      |
+| Variable               | Where                      | Purpose                                                                                                                                                                            |
+| ---------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL` | Cloudflare Pages build env | Canonical origin for metadata, sitemap, RSS (default `https://lanttusanomat.pages.dev`)                                                                                            |
+| `ANTHROPIC_API_KEY`    | GitHub Actions **secret**  | Claude Console API key (`sk-ant-api…`) for article generation. Never exposed to the frontend; the generation workflow no-ops without a credential.                                 |
+| `ANTHROPIC_AUTH_TOKEN` | GitHub Actions **secret**  | Alternative: an OAuth access token (`sk-ant-oat…`), sent as a Bearer token. Note that Claude Pro/Max subscription tokens are scoped to Claude Code and may be rejected by the API. |
+| `NODE_VERSION`         | Cloudflare Pages build env | Set to `22`                                                                                                                                                                        |
 
 There are no runtime secrets — the deployed site is purely static files.
 

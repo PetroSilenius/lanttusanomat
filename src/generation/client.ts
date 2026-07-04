@@ -5,15 +5,43 @@ import { satireOutputSchema, type SatireOutput } from './article'
 const MODEL = 'claude-opus-4-8'
 
 /**
+ * Builds the Anthropic client from whichever credential is available:
+ *
+ * - `ANTHROPIC_API_KEY` — a Console API key (`sk-ant-api…`), sent as x-api-key.
+ * - `ANTHROPIC_AUTH_TOKEN` — an OAuth access token, sent as a Bearer token
+ *   with the `oauth-2025-04-20` beta header the API requires for OAuth auth.
+ * - An OAuth token (`sk-ant-oat…`) pasted into `ANTHROPIC_API_KEY` is
+ *   detected and treated as a Bearer token instead of an API key.
+ *
+ * Either way the credential lives only in GitHub Actions secrets; nothing
+ * here runs in the frontend.
+ */
+export function createGenerationClient(): Anthropic {
+  const oauthOptions = {
+    // Never send x-api-key alongside the Bearer token — the API rejects
+    // requests carrying both headers.
+    apiKey: null,
+    defaultHeaders: { 'anthropic-beta': 'oauth-2025-04-20' },
+  }
+  const authToken = process.env.ANTHROPIC_AUTH_TOKEN
+  if (authToken) {
+    return new Anthropic({ ...oauthOptions, authToken })
+  }
+  const apiKey = process.env.ANTHROPIC_API_KEY
+  if (apiKey?.startsWith('sk-ant-oat')) {
+    return new Anthropic({ ...oauthOptions, authToken: apiKey })
+  }
+  return new Anthropic()
+}
+
+/**
  * Calls Claude with the Satire Skill as the system prompt and a topic prompt,
- * returning schema-validated structured output. The API key is read from
- * ANTHROPIC_API_KEY (GitHub Actions secret); nothing here runs in the
- * frontend.
+ * returning schema-validated structured output.
  */
 export async function generateSatire(
   systemPrompt: string,
   topicPrompt: string,
-  client: Anthropic = new Anthropic()
+  client: Anthropic = createGenerationClient()
 ): Promise<SatireOutput> {
   const response = await client.messages.parse({
     model: MODEL,
