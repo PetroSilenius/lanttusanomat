@@ -82,7 +82,7 @@ gates must stay green.
 
 - Files are `content/articles/YYYY-MM-DD-slug.md`; slugs kebab-case, unique.
 - Categories are the fixed registry in `src/lib/categories.ts`
-  (politiikka, liikenne, ruoka, teknologia, talous, urheilu, suomalainen-elama).
+  (politiikka, liikenne, ruoka, teknologia, talous, urheilu, kotimaa).
   Adding a category means updating the registry + a hero SVG in
   `public/images/heroes/` — the schema and generation whitelist follow from it.
 - Site copy and content are Finnish; code, comments, commits and docs are English.

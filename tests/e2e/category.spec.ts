@@ -23,9 +23,9 @@ test.describe('Category navigation', () => {
   test('footer links reach every category', async ({ page }) => {
     await page.goto('/')
     const footerNav = page.getByRole('navigation', { name: 'Kategoriat (alatunniste)' })
-    await footerNav.getByRole('link', { name: 'Suomalainen elämä' }).click()
-    await expect(page).toHaveURL(/\/kategoria\/suomalainen-elama/)
-    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Suomalainen elämä')
+    await footerNav.getByRole('link', { name: 'Kotimaa' }).click()
+    await expect(page).toHaveURL(/\/kategoria\/kotimaa/)
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText('Kotimaa')
   })
 
   test('unknown category returns 404', async ({ page }) => {

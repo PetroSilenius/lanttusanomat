@@ -59,7 +59,7 @@ title: 'Otsikko tähän'
 slug: otsikko-tahan # unique, kebab-case
 date: 2026-07-02T06:30:00.000Z
 author: Toimitus # or "Lanttusanomat AI-toimitus"
-category: politiikka # politiikka | liikenne | ruoka | teknologia | talous | urheilu | suomalainen-elama
+category: politiikka # politiikka | liikenne | ruoka | teknologia | talous | urheilu | kotimaa
 summary: >-
   1–2 sentence ingress shown in cards, feeds and social previews.
 tags: [avainsana, toinen]
