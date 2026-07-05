@@ -98,9 +98,10 @@ Helsinki time):
    Claude Code reads the briefing and `skills/satiiri/SKILL.md` and writes the
    article Markdown files.
 3. **Editorial gate** (`scripts/validate-articles.mts`): re-applies the schema,
-   `aiGenerated`, word-count and banned-topic checks to the new files, and a
-   final `pnpm build` re-validates all content. Invalid output fails the run
-   instead of being published.
+   `aiGenerated`, word-count and banned-topic checks to the new files. Any
+   article that fails is discarded so the valid ones in the same batch still
+   ship; the run only fails if none pass. A final `pnpm build` re-validates all
+   content before commit.
 
 The commit to `main` triggers the Cloudflare deployment.
 
