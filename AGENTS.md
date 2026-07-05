@@ -18,7 +18,7 @@ pnpm format           # Prettier write; format:check must pass in CI
 pnpm test             # Vitest unit + integration (tests/unit, tests/integration)
 pnpm test:e2e         # Playwright against the real static build (tests/e2e)
 pnpm lhci             # Lighthouse CI budgets: perf ≥95, a11y ≥95, bp ≥95, SEO =100
-pnpm generate:articles --dry-run   # AI pipeline topic selection, no API calls
+pnpm select:topics                 # print today's safety-filtered topic briefing
 ```
 
 Run a single Vitest file with `pnpm test tests/unit/search.test.ts`; a single
@@ -32,9 +32,10 @@ gates must stay green.
 
 - `src/lib/` — content loading, zod frontmatter schema, markdown pipeline,
   search, SEO builders. **Pure TypeScript, no React/Next imports.** Unit-tested.
-- `src/generation/` — AI satire pipeline (feeds, RSS parsing, topic clustering,
-  safety filter, Claude client, output validation, Markdown serialization).
-  Same purity rule. Orchestrated by `scripts/generate-articles.mts`.
+- `src/generation/` — topic-discovery library for the satire pipeline (news
+  feeds, RSS parsing, cross-source topic clustering, banned-topic safety
+  filter). Same purity rule. `scripts/select-topics.mts` turns it into the daily
+  topic briefing; the Claude Code GitHub Action writes the articles from that.
 - `src/app/` + `src/components/` — the UI. Server components by default; the
   only client components are `OfflineIndicator`, `ServiceWorkerRegistrar` and
   `haku/SearchClient`. Keep it that way — minimal JS is a core requirement.
@@ -54,17 +55,13 @@ gates must stay green.
   middleware, no `next/image` optimization (images are `unoptimized`).
 - **No new runtime dependencies without good reason.** Search, RSS parsing and
   the service worker are deliberately dependency-free.
-- **No secrets in the frontend.** The only secrets anywhere are the Claude
-  credentials for article generation (`CLAUDE_CODE_OAUTH_TOKEN` for the Claude
-  Code action path, or `ANTHROPIC_API_KEY` for the SDK pipeline — see
-  `.github/workflows/generate-articles.yml`), and they live exclusively in
-  GitHub Actions.
+- **No secrets in the frontend.** The only secret anywhere is
+  `CLAUDE_CODE_OAUTH_TOKEN` (the Claude subscription token the article-generation
+  workflow uses — see `.github/workflows/generate-articles.yml`), and it lives
+  exclusively in GitHub Actions.
 - **System font stack, no external requests.** The CSP in `public/_headers`
   allows same-origin only; anything loading from a third-party origin will be
   blocked in production.
-- `src/generation/article.ts` imports zod from **`zod/v4`** (required by the
-  Anthropic SDK's `zodOutputFormat`); `src/lib/schema.ts` uses zod v3 API from
-  `zod`. Don't "unify" these.
 
 ## Editorial & safety rules (load-bearing, tested)
 

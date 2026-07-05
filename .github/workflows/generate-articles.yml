@@ -25,53 +25,43 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      # Two supported credentials:
-      #  - CLAUDE_CODE_OAUTH_TOKEN (from `claude setup-token`, works with a
-      #    Claude subscription) -> articles written by the Claude Code action
-      #  - ANTHROPIC_API_KEY (Console API key) -> deterministic SDK pipeline
-      - name: Detect credential
+      # A Claude subscription token from `claude setup-token`. Without it the
+      # job no-ops (e.g. on forks that don't have the secret).
+      - name: Check for credential
         id: cred
         run: |
           if [ -n "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
-            echo "mode=claude-code" >> "$GITHUB_OUTPUT"
-          elif [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
-            echo "mode=api" >> "$GITHUB_OUTPUT"
+            echo "available=true" >> "$GITHUB_OUTPUT"
           else
-            echo "No CLAUDE_CODE_OAUTH_TOKEN or ANTHROPIC_API_KEY secret; skipping generation."
-            echo "mode=none" >> "$GITHUB_OUTPUT"
+            echo "CLAUDE_CODE_OAUTH_TOKEN secret is not set; skipping generation."
+            echo "available=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/checkout@v4
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
 
       - uses: pnpm/action-setup@v4
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
 
       - uses: actions/setup-node@v4
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
         with:
           node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
 
-      # Topic discovery, clustering and the banned-topic filter always run in
-      # deterministic, unit-tested code — regardless of which engine writes.
+      # Topic discovery, clustering and the banned-topic filter run in
+      # deterministic, unit-tested code and never touch the Claude API.
       - name: Select today's topics
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
         run: |
-          pnpm generate:articles --dry-run --count ${{ github.event.inputs.count || '2' }} \
+          pnpm select:topics --count ${{ github.event.inputs.count || '2' }} \
             | tee /tmp/daily-topics.md
 
-      - name: Generate articles (API pipeline)
-        if: steps.cred.outputs.mode == 'api'
-        run: pnpm generate:articles --count ${{ github.event.inputs.count || '2' }}
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-
-      - name: Generate articles (Claude Code)
-        if: steps.cred.outputs.mode == 'claude-code'
+      - name: Write articles (Claude Code)
+        if: steps.cred.outputs.available == 'true'
         uses: anthropics/claude-code-action@v1
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
@@ -100,18 +90,18 @@ jobs:
             --allowedTools "Read,Write,Edit,Glob,Grep,Bash(pnpm build)"
             --max-turns 30
 
-      # Third editorial gate for the Claude Code path (the API pipeline runs
-      # the equivalent checks in-process before writing files).
+      # Editorial gate: re-apply schema, aiGenerated, word-count and banned-topic
+      # checks to the newly written files before anything is committed.
       - name: Validate new articles
-        if: steps.cred.outputs.mode != 'none'
-        run: pnpm exec tsx scripts/validate-articles.mts
+        if: steps.cred.outputs.available == 'true'
+        run: pnpm validate:articles
 
       - name: Validate site still builds with new content
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
         run: pnpm build
 
       - name: Commit and push
-        if: steps.cred.outputs.mode != 'none'
+        if: steps.cred.outputs.available == 'true'
         run: |
           git config user.name "lanttusanomat-bot"
           git config user.email "bot@users.noreply.github.com"

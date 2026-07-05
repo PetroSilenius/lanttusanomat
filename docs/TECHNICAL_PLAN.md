@@ -90,7 +90,8 @@ The site is Finnish-first. Routes use Finnish slugs:
 │   ├── icons/                        # PWA icons (any/maskable, apple-touch)
 │   └── images/heroes/                # stylized SVG hero illustrations
 ├── scripts/
-│   ├── generate-articles.mts         # orchestrator run by the cron workflow
+│   ├── select-topics.mts             # daily topic briefing (run by the cron workflow)
+│   ├── validate-articles.mts         # editorial gate for newly written articles
 │   ├── generate-icons.mjs            # one-shot: rasterize icon.svg → PNGs (sharp)
 │   └── serve-static.mjs              # tiny static server for e2e/LHCI (clean URLs)
 ├── skills/
@@ -99,14 +100,11 @@ The site is Finnish-first. Routes use Finnish slugs:
 ├── src/
 │   ├── app/                          # Next.js App Router (all routes above)
 │   ├── components/                   # reusable UI components
-│   ├── generation/                   # satire pipeline library (pure, unit-testable)
+│   ├── generation/                   # topic-discovery library (pure, unit-testable)
 │   │   ├── feeds.ts                  # news source registry (Yle, HS, IS, IL)
 │   │   ├── rss.ts                    # dependency-free RSS item parser
 │   │   ├── topics.ts                 # cross-source topic clustering & selection
-│   │   ├── safety.ts                 # banned-topic filter (war, tragedy, …)
-│   │   ├── skill.ts                  # loads SKILL.md, builds the model prompt
-│   │   ├── client.ts                 # Anthropic API client (fetch-based)
-│   │   └── article.ts                # output validation + Markdown serialization
+│   │   └── safety.ts                 # banned-topic filter (war, tragedy, …)
 │   └── lib/                          # content & site library (pure, unit-testable)
 │       ├── site.ts                   # site config (name, URL, nav, locale)
 │       ├── categories.ts             # category registry (slug ↔ name)
@@ -235,29 +233,30 @@ standalone`, theme/background colors, `any` + `maskable` icons (192/512), `apple
 Runs in `.github/workflows/generate-articles.yml` on cron (**2×/day**, ~08:00 & ~15:00 Helsinki
 time) + manual `workflow_dispatch`.
 
-Pipeline (`scripts/generate-articles.mts` orchestrating `src/generation/*`):
+Two-stage pipeline — deterministic topic discovery, then Claude Code writing:
 
-1. **Fetch** RSS headlines from Yle, HS, Ilta-Sanomat, Iltalehti (public RSS feeds; titles +
-   descriptions only).
-2. **Cluster** items across sources by token overlap → topics covered by multiple outlets rank
-   higher (that's "today's major news").
-3. **Safety-filter** topics against the banned list (war, terrorism, death, illness, tragedies,
-   private individuals, …) — both keyword-based here and reiterated in the Skill prompt.
-4. **Summarize**: build a short _internal factual summary_ of each selected topic (source titles +
-   descriptions distilled; never passed through to output).
-5. **Satire Skill**: send the summary into the versioned skill prompt (`skills/satiiri/SKILL.md`);
-   Claude returns strict JSON: headline, ingress, 400–800-word Finnish body, category, tags, SEO
-   description.
-6. **Validate** the model output with zod (length limits, category whitelist, banned-content
-   re-check, no source-title reuse) — invalid output is retried once, then dropped (fail-safe:
-   publishing nothing beats publishing garbage).
-7. **Serialize** to Markdown with full frontmatter (`aiGenerated: true`, `originalSources` filled).
-8. **Commit & push** to `main` with `[skip ci]`-free message → Cloudflare Pages auto-deploys.
+1. **Topic discovery** (`scripts/select-topics.mts` over `src/generation/*`, pure + unit-tested):
+   1. **Fetch** RSS headlines from Yle, HS, Ilta-Sanomat, Iltalehti (public RSS feeds; titles +
+      descriptions only).
+   2. **Cluster** items across sources by token overlap → topics covered by multiple outlets rank
+      higher (that's "today's major news").
+   3. **Safety-filter** topics against the banned list (war, terrorism, death, illness, tragedies,
+      private individuals, …) — keyword-based, and reiterated in the Skill prompt.
+   4. **Print a briefing**: a short _internal factual summary_ per topic (source titles +
+      descriptions distilled) plus source URLs. Never full source article text.
+2. **Writing** (the [Claude Code GitHub Action](https://code.claude.com/docs/en/github-actions)):
+   Claude Code reads the briefing and the versioned skill (`skills/satiiri/SKILL.md`) and writes one
+   original 400–800-word Finnish satire article per chosen topic straight into `content/articles/`
+   with full frontmatter (`aiGenerated: true`, `originalSources` filled).
+3. **Editorial gate** (`scripts/validate-articles.mts`): re-checks the new files against the zod
+   frontmatter schema, `aiGenerated`, word count and the banned-topic filter; a final `pnpm build`
+   re-validates all content. Any failure fails the run — publishing nothing beats publishing garbage.
+4. **Commit & push** to `main` → Cloudflare auto-deploys.
 
-Originality guarantees: the model only ever sees a distilled topic summary (not article text), the
-skill forbids reusing wording/structure, and a post-generation check rejects headlines that overlap
-source titles. Secrets: `ANTHROPIC_API_KEY` as a GitHub Actions secret; nothing reaches the
-frontend.
+Originality guarantees: the writer only ever sees a distilled topic briefing (not article text) and
+the skill forbids reusing wording/structure. Secret: `CLAUDE_CODE_OAUTH_TOKEN` (a Claude
+subscription token) as a GitHub Actions secret, plus the Claude GitHub App installed on the repo;
+nothing reaches the frontend.
 
 ## 9. Cloudflare deployment
 
@@ -310,7 +309,7 @@ Delivered via `public/_headers` (Cloudflare Pages):
 Notes: `'unsafe-inline'` for scripts is required by Next.js static export (hydration bootstrap);
 there is no user input rendered as HTML and no third-party origin in the policy, keeping the
 practical XSS surface minimal. No secrets exist in the frontend at all; the only secret in the
-system (`ANTHROPIC_API_KEY`) lives in GitHub Actions.
+system (`CLAUDE_CODE_OAUTH_TOKEN`) lives in GitHub Actions.
 
 ## 12. MVP delivery steps
 
