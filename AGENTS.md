@@ -1,6 +1,6 @@
 # Agent instructions — Lanttusanomat
 
-Lanttusanomat is a Finnish satire news site: a fully static Next.js 15 (App
+Lanttusanomat is a Finnish satire news site: a fully static Next.js 16 (App
 Router, `output: 'export'`) PWA whose content is Markdown in this repo, plus an
 AI pipeline that generates satire articles on a schedule. The full design is in
 `docs/TECHNICAL_PLAN.md`; the human-facing overview is `README.md`.
@@ -82,7 +82,7 @@ gates must stay green.
 
 - Files are `content/articles/YYYY-MM-DD-slug.md`; slugs kebab-case, unique.
 - Categories are the fixed registry in `src/lib/categories.ts`
-  (politiikka, liikenne, ruoka, teknologia, talous, urheilu, suomalainen-elama).
+  (politiikka, liikenne, ruoka, teknologia, talous, urheilu, kotimaa).
   Adding a category means updating the registry + a hero SVG in
   `public/images/heroes/` — the schema and generation whitelist follow from it.
 - Site copy and content are Finnish; code, comments, commits and docs are English.

@@ -74,7 +74,7 @@ Palauta täsmälleen pyydetty JSON-rakenne:
 - `ingress` – 1–2 virkkeen kärki (deck), max 300 merkkiä
 - `body` – leipäteksti Markdownina (400–800 sanaa, ##-väliotsikot)
 - `category` – yksi: politiikka, liikenne, ruoka, teknologia, talous, urheilu,
-  suomalainen-elama
+  kotimaa
 - `tags` – 3–6 suomenkielistä avainsanaa pienillä kirjaimilla
 - `seoDescription` – hakukoneille kirjoitettu kuvaus, max 155 merkkiä
 - `declined` – true ja muut kentät tyhjinä, jos aihe osuu kiellettyihin aiheisiin

@@ -7,10 +7,8 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-  // Fail the build on lint/type errors instead of shipping them.
-  eslint: {
-    ignoreDuringBuilds: false,
-  },
+  // Fail the build on type errors instead of shipping them. (Next 16 no
+  // longer runs ESLint during builds; linting is a separate CI step.)
   typescript: {
     ignoreBuildErrors: false,
   },

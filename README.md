@@ -11,7 +11,7 @@ The platform is a fully static, offline-capable **PWA** built with Next.js, with
 content managed as Markdown in this repository and an automated AI pipeline that
 writes two new satire articles per day.
 
-- **Frontend:** Next.js 15 (App Router, static export) · TypeScript strict · Tailwind CSS 4
+- **Frontend:** Next.js 16 (App Router, static export) · TypeScript strict · Tailwind CSS 4
 - **Content:** Markdown + validated frontmatter in [`content/articles/`](content/articles)
 - **AI pipeline:** GitHub Actions (2×/day) → [Claude Code](https://code.claude.com/docs/en/github-actions) + [Satire Skill](skills/satiiri/SKILL.md) → git commit
 - **Hosting:** Cloudflare Pages (auto-deploy on push)
@@ -59,7 +59,7 @@ title: 'Otsikko tähän'
 slug: otsikko-tahan # unique, kebab-case
 date: 2026-07-02T06:30:00.000Z
 author: Toimitus # or "Lanttusanomat AI-toimitus"
-category: politiikka # politiikka | liikenne | ruoka | teknologia | talous | urheilu | suomalainen-elama
+category: politiikka # politiikka | liikenne | ruoka | teknologia | talous | urheilu | kotimaa
 summary: >-
   1–2 sentence ingress shown in cards, feeds and social previews.
 tags: [avainsana, toinen]

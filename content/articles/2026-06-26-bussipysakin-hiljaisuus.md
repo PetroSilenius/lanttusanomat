@@ -3,7 +3,7 @@ title: 'Kaksi miestä odotti bussia vierekkäin puhumatta – "Paras keskustelu 
 slug: bussipysakin-hiljaisuus
 date: 2026-06-26T07:30:00.000Z
 author: Toimitus
-category: suomalainen-elama
+category: kotimaa
 summary: >-
   Tamperelaisella bussipysäkillä syntyi tiistaiaamuna 25 minuutin täydellinen
   hiljaisuus, jota molemmat osapuolet kuvailevat syvälliseksi ja
@@ -11,7 +11,7 @@ summary: >-
 tags: [bussipysäkki, hiljaisuus, sosiaalisuus, tampere]
 aiGenerated: false
 originalSources: []
-heroImage: /images/heroes/suomalainen-elama.svg
+heroImage: /images/heroes/kotimaa.svg
 published: true
 ---
 

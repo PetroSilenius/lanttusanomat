@@ -160,7 +160,7 @@ for editorial traceability and is verifiably absent from all rendered output (as
 
 **Categories** (fixed registry, Finnish slugs): `politiikka` (Politiikka), `liikenne` (Liikenne),
 `ruoka` (Ruoka), `teknologia` (Teknologia), `talous` (Talous), `urheilu` (Urheilu),
-`suomalainen-elama` (Suomalainen elämä).
+`kotimaa` (Kotimaa).
 
 **Transparency rendering rules:**
 
