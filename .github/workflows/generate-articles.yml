@@ -14,6 +14,9 @@ on:
 
 permissions:
   contents: write
+  # The Claude Code action authenticates to Anthropic via GitHub OIDC and
+  # cannot mint the token without this scope.
+  id-token: write
 
 concurrency:
   group: generate-articles
