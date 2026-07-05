@@ -1,21 +1,18 @@
 /**
- * Validates newly added (untracked) articles in content/articles before the
- * generation workflow commits them. This re-applies the editorial gates for
- * articles written by the Claude Code action path, where the in-process
- * validateSatireOutput() never ran:
- *   - frontmatter schema (via parseArticleSource; the build re-checks this)
- *   - aiGenerated must be true for pipeline-produced articles
- *   - body word count 300–1000
- *   - banned-topic filter over title + summary + body
+ * Editorial gate for the generation workflow. For each newly added (untracked)
+ * article in content/articles it applies validateGeneratedArticle() (schema,
+ * aiGenerated, word count, banned-topic filter).
  *
- * Exits 1 on any violation so the workflow fails before committing.
+ * Invalid articles are *removed* rather than aborting the whole batch, so one
+ * bad article no longer discards the valid ones written alongside it — the
+ * workflow goes on to build and commit whatever passed. The run only fails
+ * (exit 1) when none of the new articles are valid, so an empty or all-garbage
+ * batch still surfaces as a red run.
  */
 import { execSync } from 'node:child_process'
 import fs from 'node:fs'
 import path from 'node:path'
-import { parseArticleSource } from '../src/lib/content'
-import { isTopicSafe } from '../src/generation/safety'
-import { wordCount } from '../src/lib/markdown'
+import { validateGeneratedArticle } from '../src/generation/editorial'
 
 const newFiles = execSync('git ls-files --others --exclude-standard content/articles', {
   encoding: 'utf8',
@@ -28,30 +25,28 @@ if (newFiles.length === 0) {
   process.exit(0)
 }
 
-let failures = 0
+let kept = 0
+let removed = 0
 
 for (const file of newFiles) {
-  try {
-    const article = parseArticleSource(fs.readFileSync(file, 'utf8'), path.basename(file))
-    if (!article.aiGenerated) {
-      throw new Error('pipeline-generated articles must set aiGenerated: true')
-    }
-    const words = wordCount(article.body)
-    if (words < 300 || words > 1000) {
-      throw new Error(`body word count ${words} out of range (300–1000)`)
-    }
-    if (!isTopicSafe(`${article.title} ${article.summary} ${article.body}`)) {
-      throw new Error('content trips the banned-topic filter')
-    }
-    console.log(`OK   ${file} (${words} words, ${article.category})`)
-  } catch (error) {
-    console.error(`FAIL ${file}: ${(error as Error).message}`)
-    failures++
+  const result = validateGeneratedArticle(fs.readFileSync(file, 'utf8'), path.basename(file))
+  if (result.ok) {
+    console.log(`OK   ${file} (${result.words} words, ${result.category})`)
+    kept++
+  } else {
+    console.error(`FAIL ${file}: ${result.reason} — removing it`)
+    fs.rmSync(file)
+    removed++
   }
 }
 
-if (failures > 0) {
-  console.error(`\n${failures} of ${newFiles.length} new article(s) failed validation.`)
+if (removed > 0) {
+  console.error(`\nRemoved ${removed} invalid article(s); kept ${kept} valid one(s).`)
+}
+
+if (kept === 0) {
+  console.error('No valid new articles remain; failing the run.')
   process.exit(1)
 }
-console.log(`\nAll ${newFiles.length} new article(s) passed validation.`)
+
+console.log(`\n${kept} of ${newFiles.length} new article(s) passed validation.`)
