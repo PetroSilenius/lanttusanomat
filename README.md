@@ -13,7 +13,7 @@ writes two new satire articles per day.
 
 - **Frontend:** Next.js 16 (App Router, static export) · TypeScript strict · Tailwind CSS 4
 - **Content:** Markdown + validated frontmatter in [`content/articles/`](content/articles)
-- **AI pipeline:** GitHub Actions (2×/day) → Claude API + [Satire Skill](skills/satiiri/SKILL.md) → git commit
+- **AI pipeline:** GitHub Actions (2×/day) → [Claude Code](https://code.claude.com/docs/en/github-actions) + [Satire Skill](skills/satiiri/SKILL.md) → git commit
 - **Hosting:** Cloudflare Pages (auto-deploy on push)
 - **Tests:** Vitest + React Testing Library + Playwright + Lighthouse CI
 
@@ -88,21 +88,30 @@ validation.
 ## AI article generation (Phase 2)
 
 `.github/workflows/generate-articles.yml` runs twice a day (≈08:00 & 15:00
-Helsinki time) and:
+Helsinki time):
 
-1. fetches RSS headlines from Yle, HS, Ilta-Sanomat and Iltalehti,
-2. clusters them into topics across sources and drops unsafe ones,
-3. builds an internal factual summary per topic (never full article text),
-4. sends the summary through the Satire Skill to Claude (`claude-opus-4-8`)
-   with schema-validated structured output,
-5. validates the result (length, category, banned topics, headline originality),
-6. writes Markdown and commits — which triggers the Cloudflare deployment.
+1. **Topic discovery** (`scripts/select-topics.mts`, deterministic + unit-tested):
+   fetch RSS headlines from Yle, HS, Ilta-Sanomat and Iltalehti, cluster them
+   into topics across sources, drop unsafe ones, and print a briefing per topic
+   (internal summary + source URLs — never full article text).
+2. **Writing** (the [Claude Code GitHub Action](https://code.claude.com/docs/en/github-actions)):
+   Claude Code reads the briefing and `skills/satiiri/SKILL.md` and writes the
+   article Markdown files.
+3. **Editorial gate** (`scripts/validate-articles.mts`): re-applies the schema,
+   `aiGenerated`, word-count and banned-topic checks to the new files, and a
+   final `pnpm build` re-validates all content. Invalid output fails the run
+   instead of being published.
 
-Invalid or declined generations are skipped, never published.
+The commit to `main` triggers the Cloudflare deployment.
+
+Authentication uses a **`CLAUDE_CODE_OAUTH_TOKEN`** repo secret (from
+`claude setup-token`, works with a Claude Pro/Max subscription); the workflow
+also requires the [Claude GitHub App](https://github.com/apps/claude) installed
+on the repo. Without the secret the workflow no-ops.
 
 ```bash
-pnpm generate:articles --dry-run    # show today's candidate topics, no API calls
-pnpm generate:articles --count 2    # generate for real (needs ANTHROPIC_API_KEY)
+pnpm select:topics             # print today's topic briefing (no Claude calls)
+pnpm validate:articles         # editorial gate for untracked content/articles files
 ```
 
 ## Deployment (Cloudflare)
@@ -131,11 +140,11 @@ assets and Pages honor the `_headers` file.
 
 ## Environment variables
 
-| Variable               | Where                      | Purpose                                                                                                          |
-| ---------------------- | -------------------------- | ---------------------------------------------------------------------------------------------------------------- |
-| `NEXT_PUBLIC_SITE_URL` | Cloudflare Pages build env | Canonical origin for metadata, sitemap, RSS (default `https://lanttusanomat.pages.dev`)                          |
-| `ANTHROPIC_API_KEY`    | GitHub Actions **secret**  | Claude API key for article generation. Never exposed to the frontend; the generation workflow no-ops without it. |
-| `NODE_VERSION`         | Cloudflare Pages build env | Set to `22`                                                                                                      |
+| Variable                  | Where                      | Purpose                                                                                                                                                                                                           |
+| ------------------------- | -------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NEXT_PUBLIC_SITE_URL`    | Cloudflare Pages build env | Canonical origin for metadata, sitemap, RSS (default `https://lanttusanomat.pages.dev`)                                                                                                                           |
+| `CLAUDE_CODE_OAUTH_TOKEN` | GitHub Actions **secret**  | Claude subscription token from `claude setup-token`; the article-generation workflow uses it to run the Claude Code action. Requires the Claude GitHub App installed on the repo. The workflow no-ops without it. |
+| `NODE_VERSION`            | Cloudflare Pages build env | Set to `22`                                                                                                                                                                                                       |
 
 There are no runtime secrets — the deployed site is purely static files.
 

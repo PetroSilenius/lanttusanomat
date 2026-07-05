@@ -14,6 +14,9 @@ on:
 
 permissions:
   contents: write
+  # The Claude Code action authenticates to Anthropic via GitHub OIDC and
+  # cannot mint the token without this scope.
+  id-token: write
 
 concurrency:
   group: generate-articles
@@ -23,44 +26,85 @@ jobs:
   generate:
     name: Generate & commit articles
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
-      - name: Check for API key
-        id: key
+      # A Claude subscription token from `claude setup-token`. Without it the
+      # job no-ops (e.g. on forks that don't have the secret).
+      - name: Check for credential
+        id: cred
         run: |
-          if [ -n "${{ secrets.ANTHROPIC_API_KEY }}" ]; then
+          if [ -n "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
-            echo "ANTHROPIC_API_KEY secret is not set; skipping generation."
+            echo "CLAUDE_CODE_OAUTH_TOKEN secret is not set; skipping generation."
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
 
       - uses: actions/checkout@v7
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
 
       - uses: pnpm/action-setup@v6
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
 
       - uses: actions/setup-node@v6
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
         with:
           node-version: 22
           cache: pnpm
 
       - run: pnpm install --frozen-lockfile
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
 
-      - name: Generate articles
-        if: steps.key.outputs.available == 'true'
-        run: pnpm generate:articles --count ${{ github.event.inputs.count || '2' }}
-        env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # Topic discovery, clustering and the banned-topic filter run in
+      # deterministic, unit-tested code and never touch the Claude API.
+      - name: Select today's topics
+        if: steps.cred.outputs.available == 'true'
+        run: |
+          pnpm select:topics --count ${{ github.event.inputs.count || '2' }} \
+            | tee /tmp/daily-topics.md
+
+      - name: Write articles (Claude Code)
+        if: steps.cred.outputs.available == 'true'
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          prompt: |
+            Generate today's satire articles for Lanttusanomat.
+
+            1. Read /tmp/daily-topics.md — today's safety-filtered news topics,
+               each with an internal summary and source URLs.
+            2. Read skills/satiiri/SKILL.md — the binding editorial policy.
+            3. Pick the ${{ github.event.inputs.count || '2' }} topic(s) with the
+               best satire potential and write one completely original Finnish
+               satire article per topic, following every rule in SKILL.md.
+               Never copy source wording or structure; skip any topic that
+               touches the banned subjects.
+            4. Save each article as content/articles/<today's date YYYY-MM-DD>-<slug>.md
+               following the frontmatter conventions in CLAUDE.md exactly:
+               aiGenerated: true, author: Lanttusanomat AI-toimitus,
+               category from the fixed registry, heroImage: /images/heroes/<category>.svg,
+               originalSources: the chosen topic's source URLs, published: true.
+               Slugs must be unique — check existing files in content/articles/.
+            5. Run `pnpm build` and fix any content-validation errors it reports.
+
+            Do NOT commit or push — the workflow handles that. Do not modify any
+            files outside content/articles/.
+          claude_args: |
+            --allowedTools "Read,Write,Edit,Glob,Grep,Bash(pnpm build)"
+            --max-turns 30
+
+      # Editorial gate: re-apply schema, aiGenerated, word-count and banned-topic
+      # checks to the newly written files before anything is committed.
+      - name: Validate new articles
+        if: steps.cred.outputs.available == 'true'
+        run: pnpm validate:articles
 
       - name: Validate site still builds with new content
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
         run: pnpm build
 
       - name: Commit and push
-        if: steps.key.outputs.available == 'true'
+        if: steps.cred.outputs.available == 'true'
         run: |
           git config user.name "lanttusanomat-bot"
           git config user.email "bot@users.noreply.github.com"
@@ -71,4 +115,4 @@ jobs:
           fi
           git commit -m "content: lisää päivän tekoälysatiirit"
           git push
-        # Push to main triggers the Cloudflare Pages production deployment.
+        # Push to main triggers the Cloudflare deployment.

@@ -21,11 +21,11 @@
     "test:watch": "vitest",
     "test:e2e": "playwright test",
     "lhci": "pnpm dlx @lhci/cli@0.15.x autorun",
-    "generate:articles": "tsx scripts/generate-articles.mts",
+    "select:topics": "tsx scripts/select-topics.mts",
+    "validate:articles": "tsx scripts/validate-articles.mts",
     "generate:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.110.0",
     "gray-matter": "^4.0.3",
     "next": "^16.2.10",
     "react": "^19.2.7",

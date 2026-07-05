@@ -43,7 +43,7 @@
       "automerge": true
     },
     {
-      "description": "zod major is blocked: src/lib uses the v3 API from 'zod' while src/generation deliberately imports 'zod/v4' for the Anthropic SDK — see AGENTS.md before upgrading",
+      "description": "zod major is blocked: src/lib/schema.ts uses the zod v3 API and a v4 major would break frontmatter validation — review before upgrading",
       "matchPackageNames": ["zod"],
       "matchUpdateTypes": ["major"],
       "enabled": false
