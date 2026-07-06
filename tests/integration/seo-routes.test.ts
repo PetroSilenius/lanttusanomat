@@ -84,28 +84,14 @@ describe('sitemap.xml', () => {
 })
 
 describe('robots.txt', () => {
-  it('allows crawling, hides search, and points to the sitemap', () => {
+  it('opens the whole site to every crawler and points to the sitemap', () => {
     const config = robots()
     const rules = Array.isArray(config.rules) ? config.rules : [config.rules]
+    expect(rules).toHaveLength(1)
+    expect(rules[0]!.userAgent).toBe('*')
     expect(rules[0]!.allow).toBe('/')
-    expect(rules[0]!.disallow).toContain('/haku')
+    // Nothing is gated — LLM crawlers and the /haku search UI included.
+    expect(rules[0]!.disallow ?? []).not.toContain('/haku')
     expect(String(config.sitemap)).toMatch(/^https:\/\/.*\/sitemap\.xml$/)
-  })
-
-  it('grants LLM crawlers full access, search UI included', () => {
-    const config = robots()
-    const rules = Array.isArray(config.rules) ? config.rules : [config.rules]
-    const llmRule = rules.find((rule) => {
-      const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent]
-      return agents.includes('GPTBot')
-    })
-    expect(llmRule).toBeDefined()
-    const agents = llmRule!.userAgent as string[]
-    expect(agents).toEqual(
-      expect.arrayContaining(['ClaudeBot', 'PerplexityBot', 'Google-Extended'])
-    )
-    expect(llmRule!.allow).toBe('/')
-    // No disallow — the /haku search UI is reachable by LLM crawlers.
-    expect(llmRule!.disallow ?? []).not.toContain('/haku')
   })
 })
