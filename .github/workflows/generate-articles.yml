@@ -77,8 +77,11 @@ jobs:
             3. Pick the ${{ github.event.inputs.count || '2' }} topic(s) with the
                best satire potential and write one completely original Finnish
                satire article per topic, following every rule in SKILL.md.
-               Never copy source wording or structure; skip any topic that
-               touches the banned subjects.
+               Keep the connection to the real news obvious: a reader who saw
+               today's headlines must immediately recognize which event the
+               article riffs on. Only the wording, people and details are
+               invented — never the underlying topic. Never copy source wording
+               or structure; skip any topic that touches the banned subjects.
             4. Save each article as content/articles/<today's date YYYY-MM-DD>-<slug>.md
                following the frontmatter conventions in CLAUDE.md exactly:
                aiGenerated: true, author: Lanttusanomat AI-toimitus,
