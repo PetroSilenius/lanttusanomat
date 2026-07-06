@@ -85,8 +85,13 @@ jobs:
             4. Save each article as content/articles/<today's date YYYY-MM-DD>-<slug>.md
                following the frontmatter conventions in CLAUDE.md exactly:
                aiGenerated: true, author: Lanttusanomat AI-toimitus,
-               category from the fixed registry, heroImage: /images/heroes/<category>.svg,
+               category from the fixed registry,
                originalSources: the chosen topic's source URLs, published: true.
+               For heroImage, read src/lib/heroes.ts and pick, from the chosen
+               category's three variants, the one whose description best fits the
+               article (fall back to the first/default variant if none fits
+               clearly). Every referenced image file must exist under public/ —
+               the build fails otherwise.
                Slugs must be unique — check existing files in content/articles/.
             5. Run `pnpm build` and fix any content-validation errors it reports.
 

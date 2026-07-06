@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: kesämökki järven rannalla">
+  <rect width="1200" height="630" fill="#2d3a4a"/>
+  <circle cx="960" cy="140" r="90" fill="#f5c518" opacity="0.9"/>
+  <rect x="0" y="430" width="1200" height="200" fill="#1f6b6b"/>
+  <g stroke="#2d3a4a" stroke-width="6" stroke-linecap="round" opacity="0.5">
+    <line x1="120" y1="500" x2="360" y2="500"/>
+    <line x1="820" y1="540" x2="1080" y2="540"/>
+    <line x1="500" y1="560" x2="720" y2="560"/>
+  </g>
+  <g fill="#1e3a2a">
+    <path d="M180 430 l50 -120 l50 120 z"/>
+    <path d="M250 430 l60 -150 l60 150 z"/>
+    <path d="M980 430 l55 -130 l55 130 z"/>
+  </g>
+  <rect x="470" y="300" width="260" height="150" fill="#7d4527"/>
+  <path d="M450 300 l150 -90 l150 90 z" fill="#e3554f"/>
+  <rect x="520" y="350" width="60" height="60" fill="#ffe9a8"/>
+  <rect x="630" y="350" width="60" height="100" fill="#5a3019"/>
+  <line x1="600" y1="210" x2="600" y2="150" stroke="#faf8f5" stroke-width="8" stroke-linecap="round"/>
+  <path d="M600 156 h80 l-18 20 l18 20 h-80 z" fill="#2c6fbf"/>
+</svg>

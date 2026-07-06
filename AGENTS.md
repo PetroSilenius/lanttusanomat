@@ -83,8 +83,14 @@ gates must stay green.
 - Files are `content/articles/YYYY-MM-DD-slug.md`; slugs kebab-case, unique.
 - Categories are the fixed registry in `src/lib/categories.ts`
   (politiikka, liikenne, ruoka, teknologia, talous, urheilu, kotimaa).
-  Adding a category means updating the registry + a hero SVG in
-  `public/images/heroes/` — the schema and generation whitelist follow from it.
+- Hero images: each category has **three** stylized SVGs in
+  `public/images/heroes/` (`<category>.svg`, `<category>-2.svg`,
+  `<category>-3.svg`), registered with a Finnish description in
+  `src/lib/heroes.ts` — generation picks the best-fitting variant from there.
+  An article may instead set `heroImage` to a bespoke
+  `/images/articles/<slug>.svg`; any referenced image must exist under `public/`
+  or the build fails (`loadArticles` validates this). Adding a category means
+  updating both registries + its three hero SVGs.
 - Site copy and content are Finnish; code, comments, commits and docs are English.
 
 ## Testing conventions

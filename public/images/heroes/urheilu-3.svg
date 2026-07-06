@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: mitali nauhassa">
+  <rect width="1200" height="630" fill="#5f1f2e"/>
+  <circle cx="1060" cy="130" r="160" fill="#732a3c"/>
+  <circle cx="140" cy="560" r="190" fill="#4a1622"/>
+  <path d="M470 120 l90 200 l-70 40 l-70 -150 z" fill="#e3554f"/>
+  <path d="M730 120 l-90 200 l70 40 l70 -150 z" fill="#f5c518"/>
+  <circle cx="600" cy="420" r="130" fill="#f5c518" stroke="#c9990e" stroke-width="10"/>
+  <circle cx="600" cy="420" r="92" fill="#e0b010"/>
+  <text x="600" y="452" font-family="system-ui, sans-serif" font-size="96" font-weight="800" text-anchor="middle" fill="#faf8f5">1</text>
+  <g fill="#faf8f5" opacity="0.5">
+    <circle cx="548" cy="372" r="14"/>
+  </g>
+</svg>

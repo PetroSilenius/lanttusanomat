@@ -1,8 +1,11 @@
+import fs from 'node:fs'
+import os from 'node:os'
 import path from 'node:path'
 import { describe, expect, it } from 'vitest'
 import { loadArticles, parseArticleSource } from '@/lib/content'
 
 const fixtureDir = path.join(__dirname, '..', 'fixtures', 'articles')
+const realPublicDir = path.join(__dirname, '..', '..', 'public')
 
 describe('loadArticles', () => {
   it('loads, validates and sorts published articles newest first', () => {
@@ -31,6 +34,17 @@ describe('loadArticles', () => {
     const articles = loadArticles(fixtureDir)
     const aiArticle = articles.find((a) => a.slug === 'testiartikkeli-kahvinkeitin')!
     expect(aiArticle.originalSources).toEqual(['https://example.com/salainen-lahde'])
+  })
+
+  it('accepts articles whose heroImage exists under public/', () => {
+    // The fixture references /images/heroes/ruoka.svg, which ships in public/.
+    expect(() => loadArticles(fixtureDir, realPublicDir)).not.toThrow()
+  })
+
+  it('fails the build when a heroImage file is missing', () => {
+    // Same fixtures, but an empty public dir where ruoka.svg cannot be found.
+    const emptyPublic = fs.mkdtempSync(path.join(os.tmpdir(), 'public-'))
+    expect(() => loadArticles(fixtureDir, emptyPublic)).toThrow(/heroImage .* does not exist/)
   })
 })
 
