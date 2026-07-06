@@ -84,14 +84,11 @@ describe('sitemap.xml', () => {
 })
 
 describe('robots.txt', () => {
-  it('opens the whole site to every crawler and points to the sitemap', () => {
+  it('allows crawling, hides search, and points to the sitemap', () => {
     const config = robots()
     const rules = Array.isArray(config.rules) ? config.rules : [config.rules]
-    expect(rules).toHaveLength(1)
-    expect(rules[0]!.userAgent).toBe('*')
     expect(rules[0]!.allow).toBe('/')
-    // Nothing is gated — LLM crawlers and the /haku search UI included.
-    expect(rules[0]!.disallow ?? []).not.toContain('/haku')
+    expect(rules[0]!.disallow).toContain('/haku')
     expect(String(config.sitemap)).toMatch(/^https:\/\/.*\/sitemap\.xml$/)
   })
 })
