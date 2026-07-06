@@ -9,9 +9,26 @@ export interface Article extends ParsedArticle {
 }
 
 const DEFAULT_CONTENT_DIR = path.join(process.cwd(), 'content', 'articles')
+const DEFAULT_PUBLIC_DIR = path.join(process.cwd(), 'public')
 
 function toArticle(parsed: ParsedArticle): Article {
   return { ...parsed, url: `/artikkeli/${parsed.slug}` }
+}
+
+/**
+ * Ensures a referenced hero image actually exists as a static asset. A typo in
+ * `heroImage` (a category variant or a bespoke `/images/articles/<slug>.svg`)
+ * must fail the build loudly rather than ship a broken image.
+ */
+function assertHeroImageExists(article: ParsedArticle, publicDir: string): void {
+  if (!article.heroImage) return
+  const assetPath = path.join(publicDir, article.heroImage)
+  if (!fs.existsSync(assetPath)) {
+    throw new ContentValidationError(
+      article.file,
+      `heroImage "${article.heroImage}" does not exist under public/`
+    )
+  }
 }
 
 /** Parses a single Markdown document (frontmatter + body) into an Article. */
@@ -24,10 +41,14 @@ export function parseArticleSource(source: string, file: string): Article {
  * Loads, validates and sorts all published articles (newest first).
  * Throws on any invalid file or duplicate slug so bad content fails the build.
  */
-export function loadArticles(contentDir: string = DEFAULT_CONTENT_DIR): Article[] {
+export function loadArticles(
+  contentDir: string = DEFAULT_CONTENT_DIR,
+  publicDir: string = DEFAULT_PUBLIC_DIR
+): Article[] {
   if (!fs.existsSync(contentDir)) {
     return []
   }
+  const checkAssets = fs.existsSync(publicDir)
   const files = fs
     .readdirSync(contentDir)
     .filter((f) => f.endsWith('.md'))
@@ -47,6 +68,9 @@ export function loadArticles(contentDir: string = DEFAULT_CONTENT_DIR): Article[
       )
     }
     slugs.set(article.slug, file)
+    if (checkAssets) {
+      assertHeroImageExists(article, publicDir)
+    }
     if (article.published) {
       articles.push(article)
     }

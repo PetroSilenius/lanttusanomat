@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: äänestyslipas ja äänestyslippu">
+  <rect width="1200" height="630" fill="#4a1d6e"/>
+  <circle cx="150" cy="120" r="180" fill="#5b2a86"/>
+  <circle cx="1060" cy="540" r="210" fill="#3a1458"/>
+  <rect x="420" y="330" width="360" height="230" rx="16" fill="#f5c518"/>
+  <path d="M420 330 h360 l-40 -60 h-280 z" fill="#e0b010"/>
+  <rect x="540" y="292" width="120" height="16" rx="8" fill="#2e1046"/>
+  <g transform="rotate(-14 600 250)">
+    <rect x="520" y="150" width="160" height="120" rx="8" fill="#faf8f5"/>
+    <path d="M556 210 l24 26 l52 -58" fill="none" stroke="#e3554f" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g stroke="#ffe9a8" stroke-width="10" stroke-linecap="round" opacity="0.8">
+    <line x1="470" y1="430" x2="470" y2="500"/>
+    <line x1="730" y1="430" x2="730" y2="500"/>
+  </g>
+</svg>

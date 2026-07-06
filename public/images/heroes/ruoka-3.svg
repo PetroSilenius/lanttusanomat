@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: ruokaostoskori täynnä ostoksia">
+  <rect width="1200" height="630" fill="#6b3a1f"/>
+  <circle cx="1080" cy="120" r="180" fill="#7d4527"/>
+  <circle cx="120" cy="540" r="200" fill="#5a3019"/>
+  <path d="M420 300 h360 l-34 240 a20 20 0 0 1 -20 17 h-232 a20 20 0 0 1 -20 -17 z" fill="#e3554f"/>
+  <path d="M420 300 l-40 -70 h-70" fill="none" stroke="#f5c518" stroke-width="16" stroke-linecap="round" stroke-linejoin="round"/>
+  <g stroke="#c8463f" stroke-width="8">
+    <line x1="470" y1="320" x2="452" y2="540"/>
+    <line x1="560" y1="320" x2="556" y2="540"/>
+    <line x1="650" y1="320" x2="662" y2="540"/>
+    <line x1="740" y1="320" x2="762" y2="540"/>
+    <line x1="405" y1="360" x2="795" y2="360"/>
+  </g>
+  <circle cx="520" cy="250" r="55" fill="#f5c518"/>
+  <rect x="605" y="205" width="90" height="90" rx="14" fill="#ffe9a8"/>
+  <path d="M700 250 q40 -60 80 0 q0 60 -80 40 z" fill="#7bc4a2"/>
+</svg>

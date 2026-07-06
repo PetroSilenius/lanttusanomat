@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: säästöpossu ja kolikko">
+  <rect width="1200" height="630" fill="#1e4d2b"/>
+  <circle cx="150" cy="120" r="170" fill="#2a6339"/>
+  <circle cx="1080" cy="540" r="200" fill="#153a20"/>
+  <ellipse cx="600" cy="560" rx="300" ry="34" fill="#153a20"/>
+  <ellipse cx="600" cy="400" rx="230" ry="160" fill="#e3554f"/>
+  <circle cx="470" cy="360" r="20" fill="#101c2b"/>
+  <path d="M360 380 q-50 -10 -60 40 q40 20 70 -10 z" fill="#e3554f"/>
+  <rect x="560" y="248" width="80" height="20" rx="8" fill="#101c2b"/>
+  <g fill="#c8463f">
+    <rect x="510" y="540" width="50" height="60" rx="10"/>
+    <rect x="640" y="540" width="50" height="60" rx="10"/>
+  </g>
+  <circle cx="720" cy="200" r="60" fill="#f5c518" stroke="#c9990e" stroke-width="8"/>
+  <text x="720" y="222" font-family="system-ui, sans-serif" font-size="64" font-weight="700" text-anchor="middle" fill="#6b5406">€</text>
+</svg>

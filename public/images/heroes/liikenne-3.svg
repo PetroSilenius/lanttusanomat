@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: pysäköintikyltti ja tyhjä ruutu">
+  <rect width="1200" height="630" fill="#1f3a5f"/>
+  <circle cx="1050" cy="110" r="150" fill="#2c4d7a"/>
+  <circle cx="120" cy="540" r="180" fill="#16293f"/>
+  <g stroke="#faf8f5" stroke-width="12">
+    <rect x="150" y="360" width="360" height="200" fill="none"/>
+    <line x1="330" y1="360" x2="330" y2="560"/>
+  </g>
+  <rect x="720" y="120" width="240" height="240" rx="24" fill="#2c6fbf"/>
+  <text x="840" y="300" font-family="system-ui, sans-serif" font-size="200" font-weight="800" text-anchor="middle" fill="#faf8f5">P</text>
+  <rect x="828" y="360" width="24" height="200" fill="#101c2b"/>
+  <g>
+    <rect x="820" y="470" width="230" height="80" rx="22" fill="#f5c518"/>
+    <rect x="860" y="430" width="130" height="60" rx="18" fill="#f5c518"/>
+    <circle cx="870" cy="555" r="30" fill="#101c2b"/>
+    <circle cx="1000" cy="555" r="30" fill="#101c2b"/>
+  </g>
+</svg>

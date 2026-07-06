@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: pylväikköinen hallintorakennus ja lippu">
+  <rect width="1200" height="630" fill="#4a1d6e"/>
+  <circle cx="1020" cy="120" r="180" fill="#5b2a86"/>
+  <circle cx="140" cy="560" r="220" fill="#3a1458"/>
+  <rect x="330" y="470" width="540" height="90" fill="#2e1046"/>
+  <path d="M360 260 L600 150 L840 260 z" fill="#f5c518"/>
+  <rect x="360" y="260" width="480" height="30" fill="#e0b010"/>
+  <g fill="#faf8f5">
+    <rect x="390" y="300" width="40" height="170" rx="6"/>
+    <rect x="470" y="300" width="40" height="170" rx="6"/>
+    <rect x="550" y="300" width="40" height="170" rx="6"/>
+    <rect x="630" y="300" width="40" height="170" rx="6"/>
+    <rect x="710" y="300" width="40" height="170" rx="6"/>
+    <rect x="790" y="300" width="40" height="170" rx="6"/>
+  </g>
+  <line x1="600" y1="150" x2="600" y2="70" stroke="#faf8f5" stroke-width="10" stroke-linecap="round"/>
+  <path d="M600 78 h110 l-24 26 l24 26 h-110 z" fill="#e3554f"/>
+</svg>

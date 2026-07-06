@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-label="Piirroskuva: tulostaulu ja kenttä">
+  <rect width="1200" height="630" fill="#5f1f2e"/>
+  <circle cx="140" cy="130" r="160" fill="#732a3c"/>
+  <circle cx="1080" cy="560" r="190" fill="#4a1622"/>
+  <ellipse cx="600" cy="540" rx="420" ry="70" fill="#2f7d4a"/>
+  <ellipse cx="600" cy="540" rx="120" ry="34" fill="none" stroke="#faf8f5" stroke-width="6"/>
+  <line x1="600" y1="470" x2="600" y2="590" stroke="#faf8f5" stroke-width="6"/>
+  <rect x="300" y="120" width="600" height="230" rx="20" fill="#101c2b"/>
+  <rect x="330" y="150" width="540" height="170" rx="10" fill="#1a2a3c"/>
+  <g fill="#f5c518" font-family="system-ui, sans-serif" font-size="120" font-weight="800" text-anchor="middle">
+    <text x="470" y="278">2</text>
+    <text x="730" y="278">1</text>
+  </g>
+  <g fill="#e3554f">
+    <circle cx="600" cy="205" r="12"/>
+    <circle cx="600" cy="265" r="12"/>
+  </g>
+  <rect x="440" y="350" width="20" height="120" fill="#101c2b"/>
+  <rect x="740" y="350" width="20" height="120" fill="#101c2b"/>
+</svg>
