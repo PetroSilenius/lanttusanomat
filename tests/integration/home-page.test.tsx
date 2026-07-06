@@ -28,11 +28,16 @@ describe('Home page', () => {
     }
   })
 
-  it('embeds WebSite JSON-LD with a search action', () => {
+  it('embeds WebSite and Organization JSON-LD with a search action', () => {
     const { container } = render(<HomePage />)
-    const script = container.querySelector('script[type="application/ld+json"]')!
-    const data = JSON.parse(script.innerHTML)
-    expect(data['@type']).toBe('WebSite')
-    expect(JSON.stringify(data.potentialAction)).toContain('/haku')
+    const data = [...container.querySelectorAll('script[type="application/ld+json"]')].map((s) =>
+      JSON.parse(s.innerHTML)
+    )
+    const website = data.find((d) => d['@type'] === 'WebSite')
+    const organization = data.find((d) => d['@type'] === 'NewsMediaOrganization')
+    expect(website).toBeDefined()
+    expect(JSON.stringify(website.potentialAction)).toContain('/haku')
+    expect(organization).toBeDefined()
+    expect(organization.logo.url).toContain('/icons/icon-512.png')
   })
 })
