@@ -29,6 +29,17 @@ export function AiBadge() {
   )
 }
 
+export function CategoryBadge({ name }: { name: string }) {
+  return (
+    <span
+      data-testid="category-badge"
+      className="inline-flex items-center rounded-sm bg-brand/10 px-1.5 py-0.5 text-[11px] font-extrabold tracking-wider text-brand-dark uppercase"
+    >
+      {name}
+    </span>
+  )
+}
+
 export function ArticleBadges({ aiGenerated }: { aiGenerated: boolean }) {
   return (
     <span className="inline-flex items-center gap-1.5">

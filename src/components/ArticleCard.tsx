@@ -2,7 +2,7 @@ import Link from 'next/link'
 import type { Article } from '@/lib/content'
 import { getCategory } from '@/lib/categories'
 import { formatDate } from '@/lib/format'
-import { ArticleBadges } from './Badges'
+import { ArticleBadges, CategoryBadge } from './Badges'
 
 interface ArticleCardProps {
   article: Article
@@ -34,7 +34,7 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
         ) : null}
         <div className="p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-ink-muted">
-            <span className="font-bold text-brand">{categoryName}</span>
+            <CategoryBadge name={categoryName} />
             <time dateTime={article.date.toISOString()}>{formatDate(article.date)}</time>
             <ArticleBadges aiGenerated={article.aiGenerated} />
           </div>
