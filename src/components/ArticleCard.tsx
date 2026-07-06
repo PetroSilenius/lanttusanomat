@@ -34,8 +34,8 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
         ) : null}
         <div className="p-4">
           <div className="flex flex-wrap items-center gap-2 text-xs font-semibold text-ink-muted">
-            <CategoryBadge name={categoryName} />
             <time dateTime={article.date.toISOString()}>{formatDate(article.date)}</time>
+            <CategoryBadge name={categoryName} />
             <ArticleBadges aiGenerated={article.aiGenerated} />
           </div>
           <h3
