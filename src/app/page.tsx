@@ -3,7 +3,7 @@ import { ArticleCard } from '@/components/ArticleCard'
 import { JsonLd } from '@/components/JsonLd'
 import { getAllArticles } from '@/lib/content'
 import { categories } from '@/lib/categories'
-import { websiteJsonLd } from '@/lib/seo'
+import { organizationJsonLd, websiteJsonLd } from '@/lib/seo'
 import { siteConfig } from '@/lib/site'
 
 export default function HomePage() {
@@ -13,6 +13,7 @@ export default function HomePage() {
 
   return (
     <>
+      <JsonLd data={organizationJsonLd()} />
       <JsonLd data={websiteJsonLd()} />
       <h1 className="sr-only">
         {siteConfig.name} – {siteConfig.tagline}

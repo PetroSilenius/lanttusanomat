@@ -1,8 +1,10 @@
 import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
 import { ArticleCard } from '@/components/ArticleCard'
+import { JsonLd } from '@/components/JsonLd'
 import { categories, getCategory } from '@/lib/categories'
 import { getArticlesByCategory } from '@/lib/content'
+import { breadcrumbJsonLd, collectionPageJsonLd } from '@/lib/seo'
 import { absoluteUrl } from '@/lib/site'
 
 interface CategoryPageProps {
@@ -40,6 +42,13 @@ export default async function CategoryPage({ params }: CategoryPageProps) {
 
   return (
     <>
+      <JsonLd data={collectionPageJsonLd(category, articles)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'Etusivu', url: '/' },
+          { name: category.name, url: `/kategoria/${category.slug}` },
+        ])}
+      />
       <header className="border-b-2 border-accent pb-4">
         <h1 className="text-3xl font-black text-brand-dark">{category.name}</h1>
         <p className="mt-2 text-ink-muted">{category.description}</p>

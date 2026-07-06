@@ -9,7 +9,7 @@ import { getCategory } from '@/lib/categories'
 import { getAllArticles, getArticleBySlug, getRelatedArticles } from '@/lib/content'
 import { formatDateTime } from '@/lib/format'
 import { markdownToHtml, readingTimeMinutes } from '@/lib/markdown'
-import { articleJsonLd } from '@/lib/seo'
+import { articleJsonLd, breadcrumbJsonLd } from '@/lib/seo'
 import { absoluteUrl } from '@/lib/site'
 
 interface ArticlePageProps {
@@ -63,6 +63,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   return (
     <article className="mx-auto max-w-3xl">
       <JsonLd data={articleJsonLd(article)} />
+      <JsonLd
+        data={breadcrumbJsonLd([
+          { name: 'Etusivu', url: '/' },
+          { name: category?.name ?? article.category, url: `/kategoria/${article.category}` },
+          { name: article.title, url: article.url },
+        ])}
+      />
 
       <nav aria-label="Murupolku" className="text-sm font-semibold text-ink-muted">
         <Link href="/" className="hover:text-brand">

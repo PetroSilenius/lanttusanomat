@@ -44,6 +44,18 @@ describe('Article page (AI-generated)', () => {
     expect(data.headline).toBe(getArticleBySlug(slug)!.title)
   })
 
+  it('embeds a BreadcrumbList ending at the article', async () => {
+    const { container } = await renderArticle(slug)
+    const scripts = [...container.querySelectorAll('script[type="application/ld+json"]')]
+    const breadcrumb = scripts
+      .map((s) => JSON.parse(s.innerHTML))
+      .find((d) => d['@type'] === 'BreadcrumbList')
+    expect(breadcrumb).toBeDefined()
+    const items = breadcrumb.itemListElement
+    expect(items[0].name).toBe('Etusivu')
+    expect(items[items.length - 1].name).toBe(getArticleBySlug(slug)!.title)
+  })
+
   it('never renders originalSources anywhere', async () => {
     const { container } = await renderArticle(slug)
     const html = container.innerHTML

@@ -44,4 +44,17 @@ describe('Category page', () => {
       CategoryPage({ params: Promise.resolve({ slug: 'olematon' }) })
     ).rejects.toThrowError()
   })
+
+  it('embeds CollectionPage and BreadcrumbList structured data', async () => {
+    const { container } = await renderCategory('liikenne')
+    const data = [...container.querySelectorAll('script[type="application/ld+json"]')].map((s) =>
+      JSON.parse(s.innerHTML)
+    )
+    const collection = data.find((d) => d['@type'] === 'CollectionPage')
+    const breadcrumb = data.find((d) => d['@type'] === 'BreadcrumbList')
+    expect(collection).toBeDefined()
+    expect(collection.mainEntity.numberOfItems).toBe(getArticlesByCategory('liikenne').length)
+    expect(breadcrumb).toBeDefined()
+    expect(breadcrumb.itemListElement.at(-1).name).toBe('Liikenne')
+  })
 })

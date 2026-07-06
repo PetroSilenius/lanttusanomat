@@ -91,4 +91,21 @@ describe('robots.txt', () => {
     expect(rules[0]!.disallow).toContain('/haku')
     expect(String(config.sitemap)).toMatch(/^https:\/\/.*\/sitemap\.xml$/)
   })
+
+  it('grants LLM crawlers full access, search UI included', () => {
+    const config = robots()
+    const rules = Array.isArray(config.rules) ? config.rules : [config.rules]
+    const llmRule = rules.find((rule) => {
+      const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent]
+      return agents.includes('GPTBot')
+    })
+    expect(llmRule).toBeDefined()
+    const agents = llmRule!.userAgent as string[]
+    expect(agents).toEqual(
+      expect.arrayContaining(['ClaudeBot', 'PerplexityBot', 'Google-Extended'])
+    )
+    expect(llmRule!.allow).toBe('/')
+    // No disallow — the /haku search UI is reachable by LLM crawlers.
+    expect(llmRule!.disallow ?? []).not.toContain('/haku')
+  })
 })
