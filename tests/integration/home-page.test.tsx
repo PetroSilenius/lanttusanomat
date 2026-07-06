@@ -1,8 +1,8 @@
 // @vitest-environment jsdom
-import { cleanup, render, screen } from '@testing-library/react'
+import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import HomePage from '@/app/page'
-import { categories } from '@/lib/categories'
+import { categories, getCategory } from '@/lib/categories'
 import { getAllArticles } from '@/lib/content'
 
 afterEach(cleanup)
@@ -18,6 +18,15 @@ describe('Home page', () => {
     render(<HomePage />)
     const cards = screen.getAllByTestId('article-card')
     expect(cards.length).toBeGreaterThanOrEqual(Math.min(getAllArticles().length, 7))
+  })
+
+  it('shows the category as a tag on the featured card', () => {
+    render(<HomePage />)
+    const featured = getAllArticles()[0]!
+    const card = screen.getByText(featured.title).closest('[data-testid="article-card"]')!
+    const categoryName = getCategory(featured.category)?.name ?? featured.category
+    const badge = within(card as HTMLElement).getByTestId('category-badge')
+    expect(badge.textContent).toBe(categoryName)
   })
 
   it('links to every category', () => {
