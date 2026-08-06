@@ -93,7 +93,10 @@ Helsinki time):
 1. **Topic discovery** (`scripts/select-topics.mts`, deterministic + unit-tested):
    fetch RSS headlines from Yle, HS, Ilta-Sanomat and Iltalehti, cluster them
    into topics across sources, drop unsafe ones, and print a briefing per topic
-   (internal summary + source URLs — never full article text).
+   (internal summary + source URLs — never full article text). The briefing ends
+   with a repetition report over the last 14 days of articles, listing the
+   satirical devices and categories that have been overused, so the writer is
+   steered away from them.
 2. **Writing** (the [Claude Code GitHub Action](https://code.claude.com/docs/en/github-actions)):
    Claude Code reads the briefing and `skills/satiiri/SKILL.md` and writes the
    article Markdown files.
