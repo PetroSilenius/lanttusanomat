@@ -151,7 +151,7 @@ originalSources: # metadata only — NEVER rendered
 heroImage: /images/heroes/liikenne.svg
 published: true # false = excluded from build entirely
 ---
-Article body in Markdown (400–800 words for AI articles)…
+Article body in Markdown (350–700 words for AI articles)…
 ```
 
 Validation: a `zod` schema (`src/lib/schema.ts`) parses every file at build time. Unknown category,
@@ -244,10 +244,15 @@ Two-stage pipeline — deterministic topic discovery, then Claude Code writing:
       private individuals, …) — keyword-based, and reiterated in the Skill prompt.
    4. **Print a briefing**: a short _internal factual summary_ per topic (source titles +
       descriptions distilled) plus source URLs. Never full source article text.
+   5. **Report repetition** (`src/generation/motifs.ts`): count the satirical devices, structural
+      beats and categories used in the last 14 days of published articles, and append the overused
+      ones to the briefing. The pipeline is otherwise stateless and drifts into a single formula
+      ("an institution founds a työryhmä"); this is what gives it memory of its own output.
 2. **Writing** (the [Claude Code GitHub Action](https://code.claude.com/docs/en/github-actions)):
-   Claude Code reads the briefing and the versioned skill (`skills/satiiri/SKILL.md`) and writes one
-   original 400–800-word Finnish satire article per chosen topic straight into `content/articles/`
-   with full frontmatter (`aiGenerated: true`, `originalSources` filled).
+   Claude Code reads the briefing and the versioned skill (`skills/satiiri/SKILL.md`), picks a
+   device that the repetition report has not flagged, and writes one original 350–700-word Finnish
+   satire article per chosen topic straight into `content/articles/` with full frontmatter
+   (`aiGenerated: true`, `originalSources` filled).
 3. **Editorial gate** (`scripts/validate-articles.mts`): re-checks the new files against the zod
    frontmatter schema, `aiGenerated`, word count and the banned-topic filter; a final `pnpm build`
    re-validates all content. Any failure fails the run — publishing nothing beats publishing garbage.

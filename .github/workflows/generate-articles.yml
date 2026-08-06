@@ -72,7 +72,9 @@ jobs:
             Generate today's satire articles for Lanttusanomat.
 
             1. Read /tmp/daily-topics.md — today's safety-filtered news topics,
-               each with an internal summary and source URLs.
+               each with an internal summary and source URLs, followed by a
+               "Viime aikoina käytetyt keinot" section listing the satirical
+               devices and categories that recent articles have worn out.
             2. Read skills/satiiri/SKILL.md — the binding editorial policy.
             3. Pick the ${{ github.event.inputs.count || '2' }} topic(s) with the
                best satire potential and write one completely original Finnish
@@ -82,6 +84,11 @@ jobs:
                article riffs on. Only the wording, people and details are
                invented — never the underlying topic. Never copy source wording
                or structure; skip any topic that touches the banned subjects.
+               Before writing each article, state which of the twelve devices in
+               SKILL.md you are using. Do not use a device the repetition report
+               lists as worn out, and do not reuse the same device twice in one
+               run. Vary length, structure, target institution and category
+               between the articles you write today.
             4. Save each article as content/articles/<today's date YYYY-MM-DD>-<slug>.md
                following the frontmatter conventions in CLAUDE.md exactly:
                aiGenerated: true, author: Lanttusanomat AI-toimitus,

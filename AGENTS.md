@@ -34,8 +34,9 @@ gates must stay green.
   search, SEO builders. **Pure TypeScript, no React/Next imports.** Unit-tested.
 - `src/generation/` — topic-discovery library for the satire pipeline (news
   feeds, RSS parsing, cross-source topic clustering, banned-topic safety
-  filter). Same purity rule. `scripts/select-topics.mts` turns it into the daily
-  topic briefing; the Claude Code GitHub Action writes the articles from that.
+  filter, recent-motif repetition analysis). Same purity rule.
+  `scripts/select-topics.mts` turns it into the daily topic briefing; the Claude
+  Code GitHub Action writes the articles from that.
 - `src/app/` + `src/components/` — the UI. Server components by default; the
   only client components are `OfflineIndicator`, `ServiceWorkerRegistrar` and
   `haku/SearchClient`. Keep it that way — minimal JS is a core requirement.
@@ -73,6 +74,13 @@ gates must stay green.
 - The banned-topic list in `src/generation/safety.ts` uses Finnish inflection-
   surviving stems (e.g. `hyökkä`, not `hyökkäys`). When adding stems, prefer the
   shortest unambiguous prefix and add a unit test.
+- Editorial variety is enforced mechanically, because the generator is stateless
+  and otherwise converges on one joke. `src/generation/motifs.ts` counts the
+  satirical devices used in recent articles and `select:topics` appends the
+  overused ones to the briefing as a "don't repeat this" list; the twelve
+  devices it maps to are enumerated in `skills/satiiri/SKILL.md`. Keep the motif
+  ids and the skill's device list in sync — its stems follow the same
+  inflection-surviving convention as `safety.ts`.
 - Satire punches up (institutions, power, phenomena) — never at private
   individuals or vulnerable groups. This policy lives in
   `skills/satiiri/SKILL.md` and is enforced three times: topic filter, skill
