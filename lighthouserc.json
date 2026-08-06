@@ -7,12 +7,13 @@
         "http://localhost/artikkeli/tutkimus-kahvitauko.html",
         "http://localhost/kategoria/politiikka.html"
       ],
-      "numberOfRuns": 1,
+      "numberOfRuns": 3,
       "settings": {
         "preset": "desktop"
       }
     },
     "assert": {
+      "aggregationMethod": "median",
       "assertions": {
         "categories:performance": ["error", { "minScore": 0.95 }],
         "categories:accessibility": ["error", { "minScore": 0.95 }],
