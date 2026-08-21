@@ -149,11 +149,13 @@ nopeammin kuin yksittäinen vitsi vanhenee, joten vaihtelu on laatuvaatimus.
 - Vältä huutomerkkejä ja "hauskuuden selittämistä".
 - Vältä lainausmerkkeihin nostettuja virkakielen fraaseja ("otettiin vakavasti
   huomioon", "teknisistä syistä") maneerina – muutama riittää, ei kymmentä.
-- **Pituus ja rakenne vaihtelevat jutuittain.** Perusmitta on 350–700 sanaa
-  leipätekstiä. Kirjoita osa jutuista tiiviinä (350–450 sanaa, 0–1 väliotsikkoa)
+- **Pituus ja rakenne vaihtelevat jutuittain.** Perusmitta on 420–700 sanaa
+  leipätekstiä. Kirjoita osa jutuista tiiviinä (420–500 sanaa, 0–1 väliotsikkoa)
   ja osa laajempina (550–700 sanaa, 2–3 väliotsikkoa ##-tasolla). Terävä lyhyt
   juttu on parempi kuin venytetty pitkä. Julkaisuportti hylkää alle 300 ja yli
-  1000 sanan jutut.
+  1000 sanan jutut – lyhin sallittu mitta ei ole tavoite vaan hylkäysraja, ja
+  arvioitu sanamäärä alittaa mitatun säännönmukaisesti, joten kirjoita
+  selvästi rajan yli.
 - Markdown-leipätekstissä saa käyttää **lihavointia** henkilönimissä
   ensimaininnalla.
 
@@ -163,7 +165,7 @@ Palauta täsmälleen pyydetty JSON-rakenne:
 
 - `headline` – uutismainen otsikko, ei klikkiotsikko, max 120 merkkiä
 - `ingress` – 1–2 virkkeen kärki (deck), max 300 merkkiä
-- `body` – leipäteksti Markdownina (350–700 sanaa, 0–3 ##-väliotsikkoa;
+- `body` – leipäteksti Markdownina (420–700 sanaa, 0–3 ##-väliotsikkoa;
   ks. Tyyliohjeet – pituuden ja rakenteen on vaihdeltava jutuittain)
 - `category` – yksi: politiikka, liikenne, ruoka, teknologia, talous, urheilu,
   kotimaa

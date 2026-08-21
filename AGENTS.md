@@ -73,7 +73,14 @@ gates must stay green.
   never appear in any rendered output, feed, or index — tests assert this too.
 - The banned-topic list in `src/generation/safety.ts` uses Finnish inflection-
   surviving stems (e.g. `hyökkä`, not `hyökkäys`). When adding stems, prefer the
-  shortest unambiguous prefix and add a unit test.
+  shortest unambiguous prefix and add a unit test. There are three lists, and
+  which one a stem belongs in is an editorial decision: `BANNED_STEMS` match
+  anywhere (compounds included), `WORD_INITIAL_STEMS` match only at the start of
+  a word — for stems whose letters are routine metaphor as the tail of a
+  compound (`hintasota`, `sähköpostitulva`) — and `SAFE_TERMS` are specific
+  non-violent terms blanked out before matching (`iskulause`, `murhaava`).
+  `findBannedStem` returns the stem that matched so rejections name it in the
+  workflow log; keep it that way, or a false positive becomes unfalsifiable.
 - Editorial variety is enforced mechanically, because the generator is stateless
   and otherwise converges on one joke. `src/generation/motifs.ts` counts the
   satirical devices used in recent articles and `select:topics` appends the

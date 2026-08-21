@@ -9,7 +9,7 @@
  */
 import { parseArticleSource } from '../lib/content'
 import { wordCount } from '../lib/markdown'
-import { isTopicSafe } from './safety'
+import { findBannedStem } from './safety'
 
 export const MIN_WORDS = 300
 export const MAX_WORDS = 1000
@@ -22,7 +22,7 @@ export type ArticleValidation =
  *   - frontmatter schema (via parseArticleSource; the build re-checks this)
  *   - aiGenerated must be true for pipeline-produced articles
  *   - body word count within [MIN_WORDS, MAX_WORDS]
- *   - banned-topic filter over title + summary + body
+ *   - banned-topic filter over title + summary + body, reporting the stem
  *
  * Returns a verdict instead of throwing so the caller can quarantine a single
  * bad article while still shipping the valid ones in the same batch.
@@ -47,8 +47,9 @@ export function validateGeneratedArticle(source: string, filename: string): Arti
     }
   }
 
-  if (!isTopicSafe(`${article.title} ${article.summary} ${article.body}`)) {
-    return { ok: false, reason: 'content trips the banned-topic filter' }
+  const bannedStem = findBannedStem(`${article.title} ${article.summary} ${article.body}`)
+  if (bannedStem) {
+    return { ok: false, reason: `content trips the banned-topic filter (matched "${bannedStem}")` }
   }
 
   return { ok: true, words, category: article.category }
