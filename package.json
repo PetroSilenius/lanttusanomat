@@ -23,6 +23,7 @@
     "lhci": "pnpm dlx @lhci/cli@0.15.x autorun",
     "select:topics": "tsx scripts/select-topics.mts",
     "validate:articles": "tsx scripts/validate-articles.mts",
+    "validate:articles:dry": "tsx scripts/validate-articles.mts --dry-run",
     "generate:icons": "node scripts/generate-icons.mjs"
   },
   "dependencies": {

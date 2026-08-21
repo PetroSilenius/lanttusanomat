@@ -60,7 +60,8 @@ describe('validateGeneratedArticle', () => {
       'unsafe.md'
     )
     expect(result).toMatchObject({ ok: false })
-    if (!result.ok) expect(result.reason).toMatch(/banned-topic/)
+    // The stem is named so a false positive is diagnosable from the CI log.
+    if (!result.ok) expect(result.reason).toMatch(/banned-topic filter \(matched "hyökkä"\)/)
   })
 
   it('rejects articles whose frontmatter fails the schema', () => {
