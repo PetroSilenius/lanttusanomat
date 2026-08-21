@@ -21,7 +21,7 @@ scale.
 ```
 ┌──────────────────────────── GitHub repository ────────────────────────────┐
 │                                                                           │
-│  content/articles/*.md  ◄── committed by humans or by the generation bot  │
+│  content/articles/*.md  ◄── committed by humans or by the daily workflow  │
 │                                                                           │
 │  ┌─────────────────────┐        ┌───────────────────────────────────┐     │
 │  │  GitHub Actions CI  │        │  GitHub Actions (cron, 2×/day)    │     │
