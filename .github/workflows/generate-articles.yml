@@ -130,8 +130,11 @@ jobs:
       - name: Commit and push
         if: steps.cred.outputs.available == 'true'
         run: |
-          git config user.name "lanttusanomat-bot"
-          git config user.email "bot@users.noreply.github.com"
+          # The articles in this commit are written by Claude, so the commit
+          # is authored by Claude rather than a nondescript bot identity —
+          # the same AI attribution the site makes to its readers.
+          git config user.name "Claude"
+          git config user.email "noreply@anthropic.com"
           git add content/articles
           if git diff --cached --quiet; then
             echo "No new articles to commit."
