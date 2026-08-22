@@ -56,10 +56,16 @@ gates must stay green.
   middleware, no `next/image` optimization (images are `unoptimized`).
 - **No new runtime dependencies without good reason.** Search, RSS parsing and
   the service worker are deliberately dependency-free.
-- **No secrets in the frontend.** The only secret anywhere is
-  `CLAUDE_CODE_OAUTH_TOKEN` (the Claude subscription token the article-generation
-  workflow uses — see `.github/workflows/generate-articles.yml`), and it lives
-  exclusively in GitHub Actions.
+- **No secrets in the frontend.** Every secret lives exclusively in GitHub
+  Actions: `CLAUDE_CODE_OAUTH_TOKEN` (the Claude subscription token the
+  article-generation workflow uses) and `PUBLISHER_APP_ID` /
+  `PUBLISHER_APP_PRIVATE_KEY` (the publishing App — see "Publishing identity"
+  below). Both are used only by `.github/workflows/generate-articles.yml`.
+- **Never add a `pull_request_target` workflow.** This repository is public and
+  holds a personal Claude subscription token. `pull_request_target` runs with
+  the base repository's secrets on code the pull request author controls, which
+  is precisely how that token would be exfiltrated. `pull_request` (which gets
+  a read-only token and no secrets on forks) is the correct trigger.
 - **System font stack, no external requests.** The CSP in `public/_headers`
   allows same-origin only; anything loading from a third-party origin will be
   blocked in production.
@@ -121,6 +127,24 @@ gates must stay green.
   automatically (never in CI).
 - New features need tests at the same standard: unit for lib/generation logic,
   integration for rendering, e2e for user-visible flows.
+
+## Publishing identity
+
+The daily content commit is pushed with an installation token from a GitHub App
+(`PUBLISHER_APP_ID` / `PUBLISHER_APP_PRIVATE_KEY`), not the default
+`GITHUB_TOKEN`. Two reasons, both load-bearing:
+
+- A branch ruleset can name a GitHub App as a bypass actor; it cannot name
+  `github-actions`. The App is what lets the scheduled push reach a protected
+  `main`.
+- Pushes made with `GITHUB_TOKEN` do not trigger workflows, so `ci.yml` never
+  ran on the content commits. An App token does trigger them.
+
+If the App secrets are absent the workflow falls back to `GITHUB_TOKEN`, which
+still works on an unprotected branch — so forks keep working — but the push
+will be rejected once a ruleset without a matching bypass is active. The commit
+author stays `Claude <noreply@anthropic.com>` either way; the App only
+authenticates the push.
 
 ## Deployment notes
 
