@@ -1,0 +1,76 @@
+# Dependency updates. This replaces renovate.json: Renovate was configured but
+# its App was never installed, while Dependabot security updates were already
+# running against the repository. The policy below is the same one renovate.json
+# described — weekly grouped updates, majors held for review, and two deliberate
+# major blocks (zod, @types/node) that are load-bearing, not housekeeping.
+version: 2
+
+updates:
+  - package-ecosystem: npm
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Helsinki
+    open-pull-requests-limit: 5
+    labels:
+      - dependencies
+    # Bump the range in package.json, matching Renovate's rangeStrategy: bump.
+    versioning-strategy: increase
+    groups:
+      # Next.js and its ESLint config are version-synced upstream.
+      next:
+        patterns:
+          - next
+          - eslint-config-next
+          - '@next/*'
+      # React and its type packages move together.
+      react:
+        patterns:
+          - react
+          - react-dom
+          - '@types/react'
+          - '@types/react-dom'
+      # Tailwind core and the PostCSS plugin move together.
+      tailwind:
+        patterns:
+          - tailwindcss
+          - '@tailwindcss/*'
+      # The markdown pipeline packages are released in lockstep.
+      markdown-pipeline:
+        patterns:
+          - unified
+          - 'remark-*'
+          - 'rehype-*'
+      # Everything else, non-major only: CI (typecheck, lint, unit, e2e,
+      # Lighthouse) is what actually gates these, so one PR a week is enough.
+      dev-minor:
+        dependency-type: development
+        update-types:
+          - minor
+          - patch
+    ignore:
+      # src/lib/schema.ts uses the zod v3 API; a v4 major breaks frontmatter
+      # validation and therefore the build. Upgrading is a code change, not a
+      # dependency bump — see AGENTS.md.
+      - dependency-name: zod
+        update-types: ['version-update:semver-major']
+      # @types/node follows the Node runtime (22 in CI and on Cloudflare), not
+      # the newest release.
+      - dependency-name: '@types/node'
+        update-types: ['version-update:semver-major']
+
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: '06:00'
+      timezone: Europe/Helsinki
+    labels:
+      - dependencies
+    groups:
+      actions:
+        patterns:
+          - '*'
