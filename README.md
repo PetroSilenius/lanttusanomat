@@ -154,13 +154,27 @@ There are no runtime secrets — the deployed site is purely static files.
 
 ## Dependency updates
 
-Dependency updates are automated with [Renovate](https://docs.renovatebot.com/)
-([`renovate.json`](renovate.json)): weekly grouped update PRs, monthly lockfile
-maintenance, pinned GitHub Action digests, and automerge for dev-dependency
-minors once CI is green. Majors always wait for review, and `zod` majors are
-blocked on purpose (see `AGENTS.md` for the v3/v4 split). To activate it,
-install the [Renovate GitHub App](https://github.com/apps/renovate) and grant
-it access to this repository.
+Dependency updates are automated with
+[Dependabot](https://docs.github.com/en/code-security/dependabot)
+([`.github/dependabot.yml`](.github/dependabot.yml)): weekly grouped update PRs
+for npm packages and GitHub Actions, every Monday morning Helsinki time.
+Related packages are grouped so they move together — Next.js with its ESLint
+config, React with its types, Tailwind with its PostCSS plugin, and the
+`unified`/`remark`/`rehype` markdown pipeline — and dev-dependency minors and
+patches arrive as a single PR, since CI is what actually gates them.
+
+Two majors are ignored on purpose:
+
+- **`zod`** — `src/lib/schema.ts` uses the zod v3 API, and a v4 major breaks
+  frontmatter validation and therefore the build. Upgrading is a code change,
+  not a dependency bump.
+- **`@types/node`** — follows the Node runtime (22 in CI and on Cloudflare),
+  not the newest release.
+
+Dependabot needs no app install; it is enabled in the repository's
+**Settings → Code security**. Note that it has no automerge of its own — if you
+want dev-dependency minors to merge themselves once CI is green, that takes a
+separate workflow using `gh pr merge --auto`.
 
 ## Project structure
 
