@@ -28,20 +28,50 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
-      # A Claude subscription token from `claude setup-token`. Without it the
-      # job no-ops (e.g. on forks that don't have the secret).
-      - name: Check for credential
+      # CLAUDE_CODE_OAUTH_TOKEN is a Claude subscription token from
+      # `claude setup-token`; without it the job no-ops (e.g. on forks that
+      # don't have the secret). PUBLISHER_APP_* is the GitHub App that pushes
+      # the content commit — see "Publishing identity" in AGENTS.md. Without it
+      # the push falls back to GITHUB_TOKEN, which still works on an
+      # unprotected branch.
+      - name: Check for credentials
         id: cred
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          PUBLISHER_APP_ID: ${{ secrets.PUBLISHER_APP_ID }}
+          PUBLISHER_APP_PRIVATE_KEY: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
         run: |
-          if [ -n "${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}" ]; then
+          if [ -n "$CLAUDE_CODE_OAUTH_TOKEN" ]; then
             echo "available=true" >> "$GITHUB_OUTPUT"
           else
             echo "CLAUDE_CODE_OAUTH_TOKEN secret is not set; skipping generation."
             echo "available=false" >> "$GITHUB_OUTPUT"
           fi
+          if [ -n "$PUBLISHER_APP_ID" ] && [ -n "$PUBLISHER_APP_PRIVATE_KEY" ]; then
+            echo "publisher=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Publisher App secrets are not set; pushing with GITHUB_TOKEN."
+            echo "publisher=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # Mint an installation token for the publishing App. Two reasons this is
+      # not the default GITHUB_TOKEN: a ruleset can name an App as a bypass
+      # actor but cannot name `github-actions`, and pushes made with
+      # GITHUB_TOKEN do not trigger workflows — which is why CI has never run
+      # on the daily content commits.
+      - name: Mint publisher token
+        id: publisher
+        if: steps.cred.outputs.available == 'true' && steps.cred.outputs.publisher == 'true'
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ secrets.PUBLISHER_APP_ID }}
+          private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
 
       - uses: actions/checkout@v7
         if: steps.cred.outputs.available == 'true'
+        with:
+          # checkout persists this credential for the `git push` step below.
+          token: ${{ steps.publisher.outputs.token || github.token }}
 
       - uses: pnpm/action-setup@v6
         if: steps.cred.outputs.available == 'true'
