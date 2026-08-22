@@ -62,7 +62,7 @@ jobs:
       - name: Mint publisher token
         id: publisher
         if: steps.cred.outputs.available == 'true' && steps.cred.outputs.publisher == 'true'
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         with:
           app-id: ${{ secrets.PUBLISHER_APP_ID }}
           private-key: ${{ secrets.PUBLISHER_APP_PRIVATE_KEY }}
@@ -76,7 +76,7 @@ jobs:
       - uses: pnpm/action-setup@v6
         if: steps.cred.outputs.available == 'true'
 
-      - uses: actions/setup-node@v6
+      - uses: actions/setup-node@v7
         if: steps.cred.outputs.available == 'true'
         with:
           node-version: 22
