@@ -15,8 +15,8 @@ export default function OfflinePage() {
       </p>
       <h1 className="mt-4 text-3xl font-black text-brand-dark">Ei verkkoyhteyttä</h1>
       <p className="mt-3 leading-relaxed text-ink-muted">
-        Tätä sivua ei ole tallennettu laitteellesi. Aiemmin avaamasi artikkelit ja viimeksi ladattu
-        etusivu ovat luettavissa myös ilman verkkoa.
+        Tätä sivua ei ole tallennettu laitteellesi. Aiemmin avaamasi artikkelit, viimeksi ladattu
+        etusivu ja sen tuoreimmat uutiset ovat luettavissa myös ilman verkkoa.
       </p>
       <Link
         href="/"
