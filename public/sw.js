@@ -6,12 +6,16 @@
  *  - HTML navigations: network-first, falling back to cache, then /offline.
  *    Every successfully fetched page is cached, so recently opened articles
  *    and the latest homepage stay readable offline.
+ *  - Every time the homepage is fetched from the network, the articles listed
+ *    on it (offline-manifest.json) are fetched and cached in the background
+ *    too, so the front page's listing is readable offline even for articles
+ *    the visitor never opened themselves.
  *  - Hashed build assets (/_next/static) and images: cache-first (immutable).
  *  - Search index: stale-while-revalidate so search works offline.
  *  - Page cache is trimmed to a maximum size (rough LRU) to bound storage.
  */
 
-const VERSION = 'v1'
+const VERSION = 'v2'
 const PRECACHE = `lanttusanomat-precache-${VERSION}`
 const PAGES = `lanttusanomat-pages-${VERSION}`
 const ASSETS = `lanttusanomat-assets-${VERSION}`
@@ -35,6 +39,7 @@ self.addEventListener('activate', (event) => {
       .keys()
       .then((keys) => Promise.all(keys.filter((key) => !keep.has(key)).map((key) => caches.delete(key))))
       .then(() => self.clients.claim())
+      .then(() => precacheLatestListing())
   )
 })
 
@@ -59,6 +64,34 @@ async function handleNavigation(request) {
     const cached = (await caches.match(request)) || (await caches.match('/offline'))
     if (cached) return cached
     return new Response('Offline', { status: 503, headers: { 'Content-Type': 'text/plain' } })
+  }
+}
+
+/**
+ * Fetches the homepage's listing manifest and caches each listed article
+ * page, so the front page's "tuoreimmat" list stays readable offline even
+ * for articles the visitor hasn't opened yet. Best-effort: network issues
+ * are swallowed, since this only supplements the normal navigation caching.
+ */
+async function precacheLatestListing() {
+  try {
+    const manifestResponse = await fetch('/offline-manifest.json')
+    if (!manifestResponse.ok) return
+    const { articles } = await manifestResponse.json()
+    const cache = await caches.open(PAGES)
+    await Promise.all(
+      articles.map(async (url) => {
+        try {
+          const response = await fetch(url)
+          if (response.ok) await cache.put(url, response)
+        } catch {
+          // Skip this article; the rest of the listing can still be cached.
+        }
+      })
+    )
+    await trimCache(PAGES, MAX_PAGE_ENTRIES)
+  } catch {
+    // Offline or the manifest failed to load; nothing to precache right now.
   }
 }
 
@@ -96,6 +129,9 @@ self.addEventListener('fetch', (event) => {
 
   if (request.mode === 'navigate') {
     event.respondWith(handleNavigation(request))
+    if (url.pathname === '/') {
+      event.waitUntil(precacheLatestListing())
+    }
     return
   }
 

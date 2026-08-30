@@ -1,9 +1,10 @@
 import { describe, expect, it } from 'vitest'
 import { GET as getFeed } from '@/app/feed.xml/route'
 import { GET as getSearchIndex } from '@/app/search-index.json/route'
+import { GET as getOfflineManifest } from '@/app/offline-manifest.json/route'
 import sitemap from '@/app/sitemap'
 import robots from '@/app/robots'
-import { getAllArticles } from '@/lib/content'
+import { getAllArticles, getLatestArticles } from '@/lib/content'
 import { categories } from '@/lib/categories'
 import { searchArticles, type SearchDoc } from '@/lib/search'
 
@@ -56,6 +57,20 @@ describe('/search-index.json', () => {
   it('does not include originalSources in index documents', async () => {
     const raw = await getSearchIndex().text()
     expect(raw).not.toContain('originalSources')
+  })
+})
+
+describe('/offline-manifest.json', () => {
+  it('lists the same articles shown in the homepage listing', async () => {
+    const { articles } = (await getOfflineManifest().json()) as { articles: string[] }
+    expect(articles).toEqual(getLatestArticles(7).map((article) => article.url))
+  })
+
+  it('only contains article URLs', async () => {
+    const { articles } = (await getOfflineManifest().json()) as { articles: string[] }
+    for (const url of articles) {
+      expect(url).toMatch(/^\/artikkeli\//)
+    }
   })
 })
 

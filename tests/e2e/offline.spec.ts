@@ -59,4 +59,31 @@ test.describe('Offline support', () => {
     await page.goto('/artikkeli/juna-saapui-ajoissa').catch(() => {})
     await expect(page.getByRole('heading', { name: 'Ei verkkoyhteyttä' })).toBeVisible()
   })
+
+  test('homepage listing articles are readable offline without opening them first', async ({
+    page,
+    context,
+  }) => {
+    await page.goto('/')
+    await waitForServiceWorker(page)
+    await page.reload() // controlled reload triggers the background listing precache
+
+    const hrefs = await page
+      .getByTestId('article-card')
+      .evaluateAll((cards) =>
+        cards
+          .map((card) => card.querySelector('a')?.getAttribute('href'))
+          .filter((href): href is string => Boolean(href))
+      )
+    const unvisited = hrefs[hrefs.length - 1]!
+
+    // Wait for the service worker's background precache to store the page.
+    await page.waitForFunction(async (path) => Boolean(await caches.match(path)), unvisited, {
+      timeout: 10_000,
+    })
+
+    await context.setOffline(true)
+    await page.goto(unvisited)
+    await expect(page.getByRole('heading', { name: 'Ei verkkoyhteyttä' })).not.toBeVisible()
+  })
 })
