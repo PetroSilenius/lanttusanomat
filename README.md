@@ -22,6 +22,17 @@ automation, security) lives in [`docs/TECHNICAL_PLAN.md`](docs/TECHNICAL_PLAN.md
 
 ---
 
+## Screenshots
+
+|                                 Front page                                 |                                    Article                                     |
+| :--------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+| ![Lanttusanomat front page](docs/screenshots/lanttusanomat-etusivu.png) | ![Lanttusanomat article page](docs/screenshots/lanttusanomat-artikkeli.png) |
+
+Every article carries a **Satiiri** badge; AI-generated articles additionally
+show the **Tekoäly** badge and an on-page disclaimer, as seen above.
+
+---
+
 ## Getting started
 
 Requirements: **Node 22+** and **pnpm 10+** (`corepack enable` gives you pnpm).
