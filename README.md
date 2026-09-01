@@ -24,8 +24,8 @@ automation, security) lives in [`docs/TECHNICAL_PLAN.md`](docs/TECHNICAL_PLAN.md
 
 ## Screenshots
 
-|                                 Front page                                 |                                    Article                                     |
-| :--------------------------------------------------------------------------: | :------------------------------------------------------------------------------: |
+|                               Front page                                |                                   Article                                   |
+| :---------------------------------------------------------------------: | :-------------------------------------------------------------------------: |
 | ![Lanttusanomat front page](docs/screenshots/lanttusanomat-etusivu.png) | ![Lanttusanomat article page](docs/screenshots/lanttusanomat-artikkeli.png) |
 
 Every article carries a **Satiiri** badge; AI-generated articles additionally
